@@ -1,0 +1,7 @@
+mat-card {
+  margin: 16px;         // Margen exterior para separarlo del resto
+  padding: 24px;        // Espacio interior para que la tabla no esté pegada
+  overflow-x: auto;     // Por si necesitas scroll lateral en móviles
+
+  display: block;       // Asegura que ocupa el ancho disponible
+}

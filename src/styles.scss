@@ -1,1 +1,81 @@
-/* You can add global styles to this file, and also import other style files */
+/* GLOBAL STYLES */
+html,
+body {
+  height: 100%;
+  margin: 0;
+  overflow: hidden;
+}
+
+/* =============================
+   DARK MODE: TEXTO E ICONOS
+   ============================= */
+body.dark-mode {
+  --primary-color: #212121;
+  --accent-color: #424242;
+  --text-color: #e0e0e0;
+  --bg-color: #121212;
+
+  background-color: var(--bg-color);
+  color: var(--text-color);
+}
+
+body.dark-mode mat-toolbar,
+body.dark-mode .mat-toolbar {
+  background-color: var(--primary-color) !important;
+  color: var(--text-color) !important;
+}
+
+body.dark-mode mat-sidenav {
+  background-color: var(--accent-color) !important;
+  color: var(--text-color) !important;
+}
+
+body.dark-mode .mat-list-item .mat-icon,
+body.dark-mode .mat-list-item span,
+body.dark-mode .mat-list-item .mat-line,
+body.dark-mode .mat-nav-list a,
+body.dark-mode .nav-item,
+body.dark-mode .nav-text,
+body.dark-mode .nav-icon{
+  color: var(--text-color) !important;
+  fill: var(--text-color) !important;
+}
+
+body.dark-mode .sidenav-footer {
+  background-color: var(--accent-color) !important;
+  color: var(--text-color) !important;
+  border-top: 1px solid #616161; // similar al estilo claro
+}
+
+body.dark-mode .sidenav-footer .profile-icon {
+  color: var(--text-color) !important;
+  fill: var(--text-color) !important;
+}
+
+body.dark-mode .sidenav-footer .profile-info .name,
+body.dark-mode .sidenav-footer .profile-info .email {
+  color: var(--text-color) !important;
+}
+
+
+/* =============================
+   ACTIVE ITEM COLOR
+   ============================= */
+body.dark-mode a.active {
+  background-color: #616161 !important;
+  border-radius: 4px;
+}
+
+body.dark-mode a.active span,
+body.dark-mode a.active .mat-icon {
+  color: #ffffff !important; // más blanco al estar activo
+}
+
+/* =============================
+   HOVER EFECTO
+   ============================= */
+body.dark-mode .nav-item:hover {
+  background-color: #333 !important;
+  border-radius: 4px;
+  transform: translateX(2px);
+}
