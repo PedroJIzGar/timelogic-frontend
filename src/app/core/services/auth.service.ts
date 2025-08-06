@@ -1,60 +1,47 @@
+// src/app/core/services/auth.service.ts
 import { Injectable } from '@angular/core';
-import { Router } from '@angular/router';
-import { jwtDecode } from 'jwt-decode';
+import {
+  Auth,
+  signInWithEmailAndPassword,
+  createUserWithEmailAndPassword,
+  signOut,
+  UserCredential,
+  getIdToken
+} from '@angular/fire/auth';
+import { BehaviorSubject } from 'rxjs';
 
-interface TokenPayload {
-  exp: number;
-  role?: string;
-  sub?: string;
-}
-
-@Injectable({
-  providedIn: 'root',
-})
+@Injectable({ providedIn: 'root' })
 export class AuthService {
-  private readonly TOKEN_KEY = 'authToken';
+  private tokenSubject = new BehaviorSubject<string | null>(null);
+  token$ = this.tokenSubject.asObservable();
 
-  constructor(private router: Router) {}
+  constructor(private auth: Auth) { }
 
-  login(token: string): void {
-    localStorage.setItem(this.TOKEN_KEY, token);
+  // LOGIN
+  async login(email: string, password: string): Promise<void> {
+    const userCredential: UserCredential = await signInWithEmailAndPassword(this.auth, email, password);
+    const token = await getIdToken(userCredential.user);
+    this.tokenSubject.next(token);
+    localStorage.setItem('token', token); //despues cambiar a cookies
   }
 
-  logout(): void {
-    localStorage.removeItem(this.TOKEN_KEY);
-    this.router.navigate(['/auth/login']);
+  // REGISTER
+  async register(email: string, password: string): Promise<void> {
+    const userCredential: UserCredential = await createUserWithEmailAndPassword(this.auth, email, password);
+    const token = await getIdToken(userCredential.user);
+    this.tokenSubject.next(token);
+    localStorage.setItem('token', token);
   }
 
-  isAuthenticated(): boolean {
-    return !!this.getToken();
+  // LOGOUT
+  async logout(): Promise<void> {
+    await signOut(this.auth);
+    this.tokenSubject.next(null);
+    localStorage.removeItem('token');
   }
 
+  // GET TOKEN
   getToken(): string | null {
-    return localStorage.getItem(this.TOKEN_KEY);
-  }
-
-  isTokenExpired(): boolean {
-    const token = this.getToken();
-    if (!token) return true;
-
-    try {
-      const decoded = jwtDecode<TokenPayload>(token);
-      const now = Math.floor(Date.now() / 1000);
-      return decoded.exp < now;
-    } catch (e) {
-      return true;
-    }
-  }
-
-  getUserRole(): string | null {
-    const token = this.getToken();
-    if (!token) return null;
-
-    try {
-      const decoded = jwtDecode<TokenPayload>(token);
-      return decoded.role || null;
-    } catch (e) {
-      return null;
-    }
+    return this.tokenSubject.value || localStorage.getItem('token');
   }
 }

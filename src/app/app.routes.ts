@@ -6,26 +6,27 @@ import { DashboardComponent } from './features/dashboard/dashboard.component';
 import { EmployeesComponent } from './features/employees/employees.component';
 import { ScheduleComponent } from './features/schedule/schedule.component';
 import { authGuard } from './core/guards/auth.guard';
+import { guestGuard } from './core/guards/guest.guard';
 
 export const routes: Routes = [
-      {
-        path: 'auth/login',
-        component: LoginComponent,
-      },
-      {
-        path: 'auth/register',
-        component: RegisterComponent,
-      },
-      {
-        path: '',
-        canActivate: [authGuard],
-        component: MainLayoutComponent,
-
-        children:[
-            {path: 'dashboard',component: DashboardComponent,},
-            {path: 'employees', component: EmployeesComponent,},
-            {path: 'schedule', component: ScheduleComponent,}
-        ]
-      },
-
+  {
+    path: 'auth/login',
+    canActivate: [guestGuard],
+    component: LoginComponent,
+  },
+  {
+    path: 'auth/register',
+    canActivate: [guestGuard],
+    component: RegisterComponent,
+  },
+  {
+    path: '',
+    canActivate: [authGuard],
+    component: MainLayoutComponent,
+    children: [
+      { path: 'dashboard', component: DashboardComponent },
+      { path: 'employees', component: EmployeesComponent },
+      { path: 'schedule', component: ScheduleComponent },
+    ],
+  },
 ];

@@ -1,3 +1,91 @@
-<p>login works!</p>
-<button (click)="login()">Iniciar sesión</button>
-¡
+<!-- =========================
+  CONTENEDOR PRINCIPAL LOGIN
+========================== -->
+<div class="login-container">
+
+    <!-- =========================
+    CARD LOGIN (Material)
+  ========================== -->
+    <mat-card class="login-card">
+
+        <!-- ===============
+      AVATAR / LOGO
+    ================ -->
+        <div class="header-avatar">
+            <img src="assets/logo1.webp" alt="Logo" width="48" height="48">
+        </div>
+
+        <!-- ===============
+      HEADER: TÍTULO Y SUBTÍTULO
+    ================ -->
+        <mat-card-header class="custom-header">
+            <mat-card-title class="header-title">Iniciar sesión</mat-card-title>
+            <mat-card-subtitle class="header-subtitle">Accede a tu cuenta para continuar</mat-card-subtitle>
+        </mat-card-header>
+
+        <!-- ===============
+      CUERPO: FORMULARIO
+    ================ -->
+        <mat-card-content>
+            <!-- Mensaje de error general -->
+            <mat-error *ngIf="errorMessage" class="login-error">
+                {{ errorMessage }}
+            </mat-error>
+
+            <!-- ====== FORMULARIO LOGIN ====== -->
+            <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
+                <!-- === EMAIL === -->
+                <mat-form-field appearance="outline" class="full-width">
+                    <mat-icon matPrefix>mail</mat-icon>
+                    <input matInput type="email" autocomplete="username" placeholder="tu@ejemplo.com"
+                        formControlName="email" />
+                    <mat-error *ngIf="email.invalid && email.touched">
+                        {{ getEmailError() }}
+                    </mat-error>
+                </mat-form-field>
+
+                <!-- === CONTRASEÑA === -->
+                <mat-form-field appearance="outline" class="full-width">
+                    <mat-icon matPrefix>lock</mat-icon>
+                    <input matInput [type]="hidePassword ? 'password' : 'text'" autocomplete="current-password"
+                        placeholder="Tu contraseña" formControlName="password">
+                    <!-- Botón para mostrar/ocultar contraseña -->
+                    <button mat-icon-button matSuffix type="button" tabindex="-1" (click)="togglePassword()"
+                        [attr.aria-label]="hidePassword ? 'Mostrar contraseña' : 'Ocultar contraseña'">
+                        <mat-icon>{{ hidePassword ? 'visibility_off' : 'visibility' }}</mat-icon>
+                    </button>
+                    <mat-error *ngIf="password.invalid && password.touched">
+                        {{ getPasswordError() }}
+                    </mat-error>
+                </mat-form-field>
+
+                <!-- === CHECKBOX RECUÉRDAME === -->
+                <mat-checkbox formControlName="rememberMe" class="remember-checkbox">
+                    Recuérdame
+                </mat-checkbox>
+
+                <!-- === BOTÓN ENTRAR === -->
+                <button mat-raised-button color="primary" class="full-width" type="submit"
+                    [disabled]="loginForm.invalid || loading">
+                    <ng-container *ngIf="!loading">Entrar</ng-container>
+                    <ng-container *ngIf="loading">
+                        <mat-progress-spinner diameter="20" mode="indeterminate" color="primary"
+                            style="vertical-align: middle;"></mat-progress-spinner>
+                        <span style="margin-left: 0.6rem;">Entrando...</span>
+                    </ng-container>
+                </button>
+            </form>
+        </mat-card-content>
+
+        <!-- ===============
+      ACCIONES / ENLACE REGISTRO
+    ================ -->
+        <mat-card-actions class="text-center">
+            <p>
+                ¿No tienes cuenta?
+                <a routerLink="/auth/register">Regístrate</a>
+            </p>
+        </mat-card-actions>
+
+    </mat-card>
+</div>
