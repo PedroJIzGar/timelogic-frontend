@@ -1,0 +1,185 @@
+/*** Layout principal: centra la tarjeta y adapta padding en cualquier pantalla ***/
+.register-container {
+    min-height: 100dvh; // Mejor que 100vh para móviles modernos (cubre notch/barras)
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 3vw; // Se adapta a pantallas grandes y pequeñas
+    background: #f5f5f5;
+    box-sizing: border-box;
+}
+
+/*** Card principal: tamaño fluido, borde y sombreado profesional ***/
+.register-card {
+    width: 100%;
+    max-width: clamp(320px, 95vw, 440px);
+    max-height: 90vh;
+    overflow-y: auto;
+    padding: clamp(1.1rem, 3.5vw, 2.5rem);
+    padding-bottom: clamp(1rem, 4vw, 1.6rem);
+    border-radius: clamp(0.7rem, 2vw, 1.2rem);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.10);
+    background: #fff;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: center;
+    scrollbar-gutter: stable both-edges;
+}
+
+/*** Avatar/logo adaptable 
+.header-avatar {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
+    width: clamp(60px, 30vw, 150px); // Fluye según pantalla
+    height: clamp(60px, 30vw, 150px);
+    margin: 0rem auto 0rem auto;
+
+    img {
+        width: 100%;
+        height: 100%;
+        height: auto;
+        display: block;
+    }
+}
+
+***/
+
+/*** Cabecera del formulario ***/
+.custom-header {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    margin-bottom: clamp(0.7rem, 2vw, 1.2rem);
+    padding-top: 0;
+
+    .header-title {
+        font-size: clamp(1.1rem, 2.5vw, 1.5rem);
+        font-weight: 600;
+    }
+
+    .header-subtitle {
+        font-size: clamp(0.8rem, 2vw, 0.95rem);
+        color: #666;
+        margin: 0.15rem 0 0.25rem 0;
+    }
+}
+
+/*** Contenido: spacing fluido ***/
+mat-card-content {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: clamp(0.5rem, 2vw, 1.15rem);
+    padding: 0;
+    padding-bottom: 0.18rem;
+}
+
+/*** Formulario fluidos ***/
+form {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: clamp(0.22rem, 1.3vw, 0.6rem);
+}
+
+/*** Inputs Angular Material ***/
+.full-width {
+    width: 100%;
+}
+
+mat-form-field.full-width {
+    width: 100%;
+
+    .mat-form-field-infix {
+        font-size: 1rem;
+        padding: 0.24rem 0;
+    }
+
+    .mat-icon {
+        color: #14739a;
+        font-size: 24px;
+    }
+
+    .mat-error {
+        font-size: 0.89rem;
+        color: #d32f2f;
+        margin-top: 0.15rem;
+        min-height: 1.2em;
+        transition: color 0.25s;
+    }
+}
+
+.password-strength {
+    margin-bottom: 0.2rem;
+    margin-top: -0.2rem;
+    font-size: 0.98rem;
+    font-weight: 500;
+
+    &.débil {
+        color: #e57373;
+    }
+
+    &.media {
+        color: #ffb300;
+    }
+
+    &.fuerte {
+        color: #43a047;
+    }
+}
+
+/*** Snackbar feedback ***/
+.snack-success {
+    background-color: #43a047 !important;
+    color: #fff !important;
+}
+
+.snack-error {
+    background-color: #d32f2f !important;
+    color: #fff !important;
+}
+
+/*** Botón profesional y fluido ***/
+button[type="submit"] {
+    margin-top: 0.45rem;
+    width: 100%;
+    transition: box-shadow 0.18s;
+    box-shadow: 0 2px 8px rgba(2, 132, 199, 0.10);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.3rem;
+    font-size: 1.05rem;
+    min-height: 2.5rem;
+    border-radius: 0.6rem;
+
+    &:hover:enabled {
+        box-shadow: 0 4px 14px rgba(2, 132, 199, 0.16);
+        filter: brightness(1.06);
+    }
+}
+
+/*** Acciones de la card ***/
+.text-center {
+    text-align: center;
+
+    p {
+        margin-bottom: 0.08rem;
+        font-size: 1rem;
+
+        a {
+            color: #0284c7;
+            font-weight: 600;
+            text-decoration: none;
+            transition: text-decoration 0.18s;
+
+            &:hover {
+                text-decoration: underline;
+            }
+        }
+    }
+}

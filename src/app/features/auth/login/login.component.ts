@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { Router } from '@angular/router';
+import { Router, RouterModule } from '@angular/router';
 import { AuthService } from '../../../core/services/auth.service';
 
 // Angular Material Modules
@@ -38,7 +38,8 @@ import { MatCheckboxModule } from '@angular/material/checkbox';
     MatInputModule,
     MatCardModule,
     MatFormFieldModule,
-    ReactiveFormsModule
+    ReactiveFormsModule,
+    RouterModule
   ],
   templateUrl: './login.component.html',
   styleUrl: './login.component.scss'

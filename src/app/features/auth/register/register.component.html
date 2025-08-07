@@ -1,1 +1,91 @@
-<p>register works!</p>
+<div class="register-container">
+    <mat-card class="register-card">
+        <!-- Logo/avatar 
+        <div class="header-avatar" aria-hidden="true">
+            <img src="assets/logo-register.webp" alt="Logo" width="64" height="64" />
+        </div>
+-->
+        <mat-card-header class="custom-header">
+            <mat-card-title class="header-title">Crear cuenta</mat-card-title>
+            <mat-card-subtitle class="header-subtitle">
+                Completa el formulario para registrarte
+            </mat-card-subtitle>
+        </mat-card-header>
+
+        <mat-card-content class="register-content-scroll">
+            <form [formGroup]="registerForm" (ngSubmit)="onSubmit()" autocomplete="off" novalidate>
+                <!-- Nombre -->
+                <mat-form-field appearance="outline" class="full-width">
+                    <mat-icon matPrefix>person</mat-icon>
+                    <input matInput placeholder="Tu nombre" formControlName="name" autocomplete="name" />
+                    <mat-error *ngIf="name.invalid && (name.dirty || name.touched)">
+                        {{ getNameError() }}
+                    </mat-error>
+                </mat-form-field>
+
+                <!-- Email -->
+                <mat-form-field appearance="outline" class="full-width">
+                    <mat-icon matPrefix>mail</mat-icon>
+                    <input matInput placeholder="Correo electrónico" formControlName="email" autocomplete="email" />
+                    <mat-error *ngIf="email.invalid && (email.dirty || email.touched)">
+                        {{ getEmailError() }}
+                    </mat-error>
+                </mat-form-field>
+
+                <!-- Contraseña -->
+                <mat-form-field appearance="outline" class="full-width">
+                    <mat-icon matPrefix>lock</mat-icon>
+                    <input matInput [type]="hidePassword ? 'password' : 'text'" placeholder="Contraseña"
+                        formControlName="password" autocomplete="new-password" />
+                    <button mat-icon-button matSuffix type="button" tabindex="-1" (click)="hidePassword = !hidePassword"
+                        [attr.aria-label]="hidePassword ? 'Mostrar contraseña' : 'Ocultar contraseña'">
+                        <mat-icon>{{ hidePassword ? 'visibility_off' : 'visibility' }}</mat-icon>
+                    </button>
+                    <mat-error *ngIf="password.invalid && (password.dirty || password.touched)">
+                        {{ getPasswordError() }}
+                    </mat-error>
+                </mat-form-field>
+
+                <!-- Fortaleza contraseña -->
+                <div *ngIf="password.value && (password.dirty || password.touched)" class="password-strength"
+                    [ngClass]="passwordStrength.toLowerCase()">
+                    Fortaleza: {{ passwordStrength }}
+                </div>
+
+                <!-- Repetir contraseña -->
+                <mat-form-field appearance="outline" class="full-width">
+                    <mat-icon matPrefix>lock</mat-icon>
+                    <input matInput [type]="hideRepeatPassword ? 'password' : 'text'" placeholder="Repite la contraseña"
+                        formControlName="repeatPassword" autocomplete="new-password" />
+                    <button mat-icon-button matSuffix type="button" tabindex="-1"
+                        (click)="hideRepeatPassword = !hideRepeatPassword"
+                        [attr.aria-label]="hideRepeatPassword ? 'Mostrar contraseña' : 'Ocultar contraseña'">
+                        <mat-icon>{{ hideRepeatPassword ? 'visibility_off' : 'visibility' }}</mat-icon>
+                    </button>
+                    <mat-error
+                        *ngIf="(repeatPassword.invalid && (repeatPassword.dirty || repeatPassword.touched)) || registerForm.hasError('notMatching')">
+                        {{ getRepeatPasswordError() }}
+                    </mat-error>
+                </mat-form-field>
+
+                <button mat-raised-button color="primary" class="full-width" type="submit" form="registerForm"
+                    [disabled]="registerForm.invalid || loading">
+                    <ng-container *ngIf="!loading">Registrarse</ng-container>
+                    <ng-container *ngIf="loading">
+                        <mat-progress-spinner mode="indeterminate" diameter="20" color="primary"
+                            style="vertical-align: middle;">
+                        </mat-progress-spinner>
+                        <span class="ml-2">Registrando...</span>
+                    </ng-container>
+                </button>
+            </form>
+        </mat-card-content>
+
+        <mat-card-actions class="text-center">
+            <p>
+                ¿Ya tienes cuenta?
+                <a routerLink="/auth/login">Inicia sesión</a>
+            </p>
+        </mat-card-actions>
+    </mat-card>
+</div>
