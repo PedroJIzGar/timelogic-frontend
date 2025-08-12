@@ -30,8 +30,7 @@ export const routes: Routes = [
         title: 'Crear cuenta',
       },
       {
-        path: 'auth/forgot-password',
-        canActivate: [guestGuard],
+        path: 'forgot-password',
         loadComponent: () =>
           import(
             './features/auth/forgot-password/forgot-password.component'
