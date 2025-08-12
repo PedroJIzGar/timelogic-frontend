@@ -1,16 +1,13 @@
+// src/app/core/guards/guest.guard.ts
 import { inject } from '@angular/core';
-import { CanActivateFn, Router } from '@angular/router';
+import { CanMatchFn, Router } from '@angular/router';
 import { AuthService } from '../services/auth.service';
+import { firstValueFrom } from 'rxjs';
 
-export const guestGuard: CanActivateFn = () => {
-  const authService = inject(AuthService);
+export const guestGuard: CanMatchFn = async () => {
+  const auth = inject(AuthService);
   const router = inject(Router);
-  const token = authService.getToken();
-
-  if (token) {
-    router.navigate(['/dashboard']); // Redirige a dashboard si ya está logueado
-    return false;
-  } else {
-    return true; // Permite el acceso a login/register si NO hay token
-  }
+  await firstValueFrom(auth.authReady$);
+  const token = await auth.getValidToken();
+  return token ? router.createUrlTree(['/dashboard']) : true;
 };

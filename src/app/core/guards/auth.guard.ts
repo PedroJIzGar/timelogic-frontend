@@ -1,17 +1,16 @@
 // src/app/core/guards/auth.guard.ts
 import { inject } from '@angular/core';
-import { CanActivateFn, Router } from '@angular/router';
+import { CanMatchFn, Router, UrlTree } from '@angular/router';
 import { AuthService } from '../services/auth.service';
+import { firstValueFrom } from 'rxjs';
 
-export const authGuard: CanActivateFn = () => {
-  const authService = inject(AuthService);
+export const authGuard: CanMatchFn = async () => {
+  const auth = inject(AuthService);
   const router = inject(Router);
 
-  const token = authService.getToken();
-  if (token) {
-    return true;
-  } else {
-    router.navigate(['auth/login']);
-    return false;
-  }
+  // Espera a la restauración de sesión de Firebase
+  await firstValueFrom(auth.authReady$);
+
+  const token = await auth.getValidToken();
+  return token ? true : router.createUrlTree(['/auth/login']);
 };
