@@ -86,6 +86,8 @@ npm ci
 # 3) Levantar en dev
 npm start   # abre http://localhost:4200
 
+```
+
 ## ⚙️ Configuración
 
 ### Estilos globales (PrimeNG)
