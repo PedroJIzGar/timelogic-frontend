@@ -1,84 +1,114 @@
-import { Component } from '@angular/core';
-import { Router, RouterModule } from '@angular/router';
-import { AuthService } from '../../../core/services/auth.service';
+/**
+ * @file LoginComponent
+ * @description
+ * Pantalla de **inicio de sesión** usando PrimeNG + Formularios Reactivos.
+ *
+ * Funcionalidad:
+ * - Validaciones de campo (`required`, `email`, `minLength`).
+ * - Accesibilidad: `id/for`, `aria-invalid`, `aria-describedby`, gestión de foco al error,
+ *   y *live region* en plantilla para anunciar errores globales.
+ * - Estado de carga con **Signals** y `<button pButton [loading]>`.
+ * - “Recuérdame”: guarda el email en `localStorage` (persistencia de sesión opcional en AuthService).
+ * - Feedback con `<p-toast>` (PrimeNG `MessageService`) y `<p-message>` global.
+ *
+ * Requisitos:
+ * - PrimeNG v17 (Card, InputText, Password, Checkbox, Button, Message, Toast).
+ * - Tema + PrimeIcons importados en `styles.scss`.
+ * - `provideAnimations()` en `main.ts` (para overlays como `p-password` con `appendTo="body"`).
+ */
 
-// Angular Material Modules
-import { MatCardModule } from "@angular/material/card";
-import { MatFormFieldModule } from '@angular/material/form-field';
+import { Component, ElementRef, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-import { MatInputModule } from '@angular/material/input';
-import { MatIconModule } from '@angular/material/icon';
-import { MatButtonModule } from '@angular/material/button';
-import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
-import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
-import { MatCheckboxModule } from '@angular/material/checkbox';
+import { Router, RouterModule } from '@angular/router';
+import { FormBuilder, Validators, ReactiveFormsModule } from '@angular/forms';
+
+// PrimeNG
+import { CardModule } from 'primeng/card';
+import { InputTextModule } from 'primeng/inputtext';
+import { PasswordModule } from 'primeng/password';
+import { CheckboxModule } from 'primeng/checkbox';
+import { ButtonModule } from 'primeng/button';
+import { MessageModule } from 'primeng/message';
+import { ToastModule } from 'primeng/toast';
+import { MessageService } from 'primeng/api';
+
+// App
+import { AuthService } from '../../../core/services/auth.service';
+import { humanizeFirebaseError } from '../../../core/errors/firebase-errors';
 
 /**
- * LoginComponent
- * --------------
- * Componente standalone que gestiona la pantalla de login de usuario.
- * Incluye:
- *  - Formulario reactivo con validación.
- *  - Mostrar/ocultar contraseña.
- *  - Recuerda email con "recuérdame".
- *  - Notificaciones de éxito/error con MatSnackBar.
- *  - Accesibilidad y feedback de carga.
+ * Componente **standalone** de Login.
+ *
+ * @example Ruteo (standalone)
+ * {
+ *   path: 'auth/login',
+ *   loadComponent: () => import('./login.component').then(c => c.LoginComponent)
+ * }
  */
 @Component({
   selector: 'app-login',
   standalone: true,
   imports: [
     CommonModule,
-    MatButtonModule,
-    MatCheckboxModule,
-    MatSnackBarModule,
-    MatIconModule,
-    MatProgressSpinnerModule,
-    MatInputModule,
-    MatCardModule,
-    MatFormFieldModule,
     ReactiveFormsModule,
-    RouterModule
+    RouterModule,
+    CardModule,
+    InputTextModule,
+    PasswordModule,
+    CheckboxModule,
+    ButtonModule,
+    MessageModule,
+    ToastModule,
   ],
+  providers: [MessageService],
   templateUrl: './login.component.html',
-  styleUrl: './login.component.scss'
+  styleUrls: ['./login.component.scss'],
 })
 export class LoginComponent {
+  /** Constructor DI helpers */
+  private fb = inject(FormBuilder);
+  private authService = inject(AuthService);
+  private router = inject(Router);
+  private messageService = inject(MessageService);
+  private host = inject(ElementRef<HTMLElement>);
 
-  /** Controla si la contraseña está oculta (por defecto true) */
-  hidePassword = true;
+  /**
+   * Estado de carga del submit.
+   * Se expone en plantilla con `loading()`.
+   */
+  loading = signal(false);
 
-  /** Formulario reactivo de login */
-  loginForm: FormGroup;
-
-  /** Estado de carga al enviar formulario */
-  loading = false;
-
-  /** Mensaje de error general para mostrar en la vista */
+  /**
+   * Mensaje de error global (se muestra con `<p-message>` y
+   * se anuncia por voz vía *live region* en la plantilla).
+   */
   errorMessage: string | null = null;
 
   /**
-   * Constructor.
-   * @param fb - FormBuilder para crear el formulario reactivo
-   * @param authService - Servicio de autenticación personalizado
-   * @param router - Router de Angular para navegación
-   * @param snackBar - MatSnackBar para notificaciones
+   * Formulario reactivo de login.
+   *
+   * Controles:
+   * - `email`: requerido, formato email.
+   * - `password`: requerido, minLength 6.
+   * - `rememberMe`: bandera para recordar el email.
    */
-  constructor(
-    private fb: FormBuilder,
-    private authService: AuthService,
-    private router: Router,
-    private snackBar: MatSnackBar
-  ) {
-    // Inicializa el formulario con validadores
-    this.loginForm = this.fb.group({
-      email: ['', [Validators.required, Validators.email]],
-      password: ['', [Validators.required, Validators.minLength(6)]],
-      rememberMe: [false]
-    });
+  loginForm = this.fb.group({
+    email: ['', [Validators.required, Validators.email]],
+    password: ['', [Validators.required, Validators.minLength(6)]],
+    rememberMe: [false],
+  });
 
-    // Rellena email si está guardado en localStorage
+  /** Getter de conveniencia: control `email`. */
+  get email() {
+    return this.loginForm.get('email')!;
+  }
+  /** Getter de conveniencia: control `password`. */
+  get password() {
+    return this.loginForm.get('password')!;
+  }
+
+  constructor() {
+    // Prefill del email si se guardó previamente
     const rememberedEmail = localStorage.getItem('rememberedEmail');
     if (rememberedEmail) {
       this.loginForm.patchValue({ email: rememberedEmail, rememberMe: true });
@@ -86,38 +116,7 @@ export class LoginComponent {
   }
 
   /**
-   * Cambia la visibilidad de la contraseña.
-   * Usado por el botón de ojo (mat-icon).
-   */
-  togglePassword(): void {
-    this.hidePassword = !this.hidePassword;
-  }
-
-  /**
-   * Getter para el control de email en el formulario.
-   * @returns FormControl de email
-   * @throws Error si el control no existe
-   */
-  get email() {
-    const control = this.loginForm.get('email');
-    if (!control) throw new Error('El control email no existe');
-    return control;
-  }
-
-  /**
-   * Getter para el control de password en el formulario.
-   * @returns FormControl de password
-   * @throws Error si el control no existe
-   */
-  get password() {
-    const control = this.loginForm.get('password');
-    if (!control) throw new Error('El control password no existe');
-    return control;
-  }
-
-  /**
-   * Devuelve el mensaje de error para el email (si existe).
-   * @returns string con el mensaje de error adecuado
+   * Devuelve un mensaje legible para el usuario cuando `email` es inválido.
    */
   getEmailError(): string {
     if (this.email.hasError('required')) return 'Debes introducir un email';
@@ -126,55 +125,94 @@ export class LoginComponent {
   }
 
   /**
-   * Devuelve el mensaje de error para la contraseña (si existe).
-   * @returns string con el mensaje de error adecuado
+   * Devuelve un mensaje legible para el usuario cuando `password` es inválido.
    */
   getPasswordError(): string {
-    if (this.password.hasError('required')) return 'Debes introducir una contraseña';
-    if (this.password.hasError('minlength')) return 'La contraseña debe tener al menos 6 caracteres';
+    if (this.password.hasError('required'))
+      return 'Debes introducir una contraseña';
+    if (this.password.hasError('minlength'))
+      return 'La contraseña debe tener al menos 6 caracteres';
     return '';
   }
 
   /**
+   * Enfoca el **primer** control inválido tras un submit fallido.
+   * Mejora la accesibilidad con teclado y lectores de pantalla.
+   */
+  private focusFirstInvalid(): void {
+    if (this.email.invalid) {
+      document.getElementById('login-email')?.focus();
+      return;
+    }
+    if (this.password.invalid) {
+      document.getElementById('login-pass')?.focus();
+      return;
+    }
+  }
+
+  /**
    * Envía el formulario de login.
-   * - Valida el formulario.
-   * - Llama al AuthService para autenticarse.
-   * - Muestra notificaciones y gestiona el estado de carga.
-   * @returns Promise<void>
+   *
+   * Flujo:
+   * 1. Si el formulario no es válido → marca controles, enfoca el primero inválido y retorna.
+   * 2. Normaliza valores (`trim`, `email` en minúsculas).
+   * 3. Autentica con `AuthService.login`.
+   *    - (Opcional) Usa preferencia de persistencia si tu servicio lo soporta.
+   * 4. Gestiona “Recuérdame”: guarda/borra el email en `localStorage`.
+   * 5. Muestra toast y navega a `/dashboard` usando `replaceUrl`.
+   * 6. En error: mapea a mensaje amigable, anuncia por live region y muestra toast.
    */
   async onSubmit(): Promise<void> {
-    if (this.loginForm.invalid) return;
+    if (this.loginForm.invalid) {
+      this.loginForm.markAllAsTouched();
+      this.focusFirstInvalid();
+      return;
+    }
 
-    this.loading = true;
+    this.loading.set(true);
     this.errorMessage = null;
 
-    const { email, password, rememberMe } = this.loginForm.value;
+    const raw = this.loginForm.value;
+    const email = (raw.email ?? '').toString().trim().toLowerCase();
+    const password = (raw.password ?? '').toString().trim();
+    const rememberMe = !!raw.rememberMe;
 
     try {
+      // Recomendado: pasar preferencia de persistencia al servicio (Firebase setPersistence)
+      // await this.authService.login(email, password, { remember: rememberMe });
+
       await this.authService.login(email, password);
 
-      // Recuerda el email si el usuario lo pide
-      if (rememberMe) {
-        localStorage.setItem('rememberedEmail', email);
-      } else {
-        localStorage.removeItem('rememberedEmail');
-      }
+      if (rememberMe) localStorage.setItem('rememberedEmail', email);
+      else localStorage.removeItem('rememberedEmail');
 
-      // Notificación de éxito y navegación
-      this.snackBar.open('¡Login correcto! Redirigiendo...', '', {
-        duration: 2000,
-        panelClass: 'snack-success'
+      this.messageService.add({
+        severity: 'success',
+        summary: 'Login correcto',
+        detail: 'Bienvenido de nuevo',
+        life: 2000,
       });
-      this.router.navigate(['/dashboard']);
+
+      this.router.navigate(['/dashboard'], { replaceUrl: true });
     } catch (error: any) {
-      this.errorMessage = 'Correo o contraseña incorrectos';
-      this.snackBar.open(this.errorMessage, 'Cerrar', {
-        duration: 4000,
-        panelClass: 'snack-error'
+      const friendly =
+        humanizeFirebaseError?.(error?.code) ??
+        'Correo o contraseña incorrectos';
+
+      // Para que el lector lo anuncie también si se repite el mismo texto:
+      this.errorMessage = null;
+      setTimeout(() => (this.errorMessage = friendly));
+
+      this.messageService.add({
+        severity: 'error',
+        summary: 'No se pudo iniciar sesión',
+        detail: friendly,
+        life: 4000,
       });
-      console.error(error);
+
+      console.error('Login error:', error);
     } finally {
-      this.loading = false;
+      this.loading.set(false);
     }
   }
 }

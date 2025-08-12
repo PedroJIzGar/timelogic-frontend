@@ -1,236 +1,77 @@
-// =============================
-// CONTENEDOR PRINCIPAL LOGIN
-// =============================
-.login-container {
-    min-height: 100vh; // Pantalla completa
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    padding: 2rem 1rem; // Relleno en móviles
-    background-color: #f5f5f5;
-    box-sizing: border-box; // Incluye el padding en el tamaño total
+/* =============================
+   CONTENEDOR PRINCIPAL LOGIN
+   ============================= */
+
+@use "../../../../styles/partials/auth" as auth; // ajusta la ruta si quieres
+
+@include auth.auth-page();
+
+/* 1) El wrapper del campo NO usa flex (deja que todo sea bloque y llene al 100%) */
+.field > .p-input-icon-left.with-separator {
+  display: block !important; /* ← esto quita el problema de encogerse */
+  width: 100% !important;
 }
 
-// =============================
-// TARJETA PRINCIPAL (CARD)
-// =============================
-.login-card {
-    width: fit-content;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    max-width: clamp(280px, 70vw, 480px);
-    max-height: 90vh;
-    overflow-y: auto;
-    padding: 2rem;
-    border-radius: 1rem;
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
-    background-color: white;
-
-    // Responsividad extrema (para móviles pequeños)
-    @media (max-width: 380px) {
-        max-width: 95vw;
-        padding: 1.2rem;
-    }
-}
-/***
-// =============================
-// AVATAR HEADER (LOGO)
-// =============================
-.header-avatar {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    overflow: hidden;
-    width: clamp(88px, 30vw, 150px);
-    height: clamp(58px, 30vw, 120px);
-    margin: 0 auto 0.1rem auto;
-
-    img {
-        width: 100%;
-        height: auto;
-        display: block;
-    }
-
-    // Tamaño menor en móviles extremos
-    @media (max-width: 380px) {
-        width: 38px;
-        height: 38px;
-    }
-}
-***/
-
-// =============================
-// CABECERA DE LA CARD (TÍTULO/SUBTÍTULO)
-// =============================
-.custom-header {
-    display: flex;
-    padding-top: 0;
-    flex-direction: column;
-    align-items: center;
-    text-align: center;
-    margin-bottom: 1.5rem;
-
-    .header-title {
-        font-size: 1.5rem;
-        font-weight: 600;
-        margin: 0;
-    }
-
-    .header-subtitle {
-        font-size: 0.95rem;
-        color: #666;
-        margin-top: 0.25rem;
-    }
+/* 2) El contenedor de p-password ocupa el 100% */
+:host ::ng-deep .p-input-icon-left.with-separator .p-password {
+  display: block !important; /* en lugar de inline-flex */
+  width: 100% !important;
 }
 
-// =============================
-// CUERPO DE LA CARD (FORM)
-// =============================
-mat-card-content {
-    display: flex;
-    flex-direction: column;
-    gap: 0.3rem;
-    padding: 0;
+/* 3) El input real llena todo y respeta icono/ojito */
+:host ::ng-deep .p-input-icon-left.with-separator .p-password-input {
+  width: 100% !important;
+  box-sizing: border-box;
+  padding-left: 52px !important; /* icono + separador */
+  padding-right: 2.25rem; /* ojo toggle */
+  min-height: 40px;
+  font-size: 0.95rem;
 }
 
-form {
-    display: flex;
-    flex-direction: column;
-    gap: 0.1rem;
+/* Extra de este componente */
+.message-global {
+  margin: 0 1rem 0.5rem;
 }
 
-// =============================
-// CAMPOS DE FORMULARIO (INPUTS)
-// =============================
-.full-width {
-    width: 100%;
+/* Debe ir tras el partial para ganar la cascada */
+.field.remember-inline {
+  display: flex !important; /* anula .field */
+  flex-direction: row !important; /* ← esto era lo que te apilaba */
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: nowrap; /* que no salte de línea */
 }
 
-// Campo de formulario (Input Angular Material)
-mat-form-field.full-width {
-    width: 100%;
-
-    .mat-form-field-infix {
-        font-size: 0.95rem;
-        padding: 0.3rem 0; // Hace el input más bajo
-    }
-
-    .mat-icon {
-        color: #14739a;
-        font-size: 24px;
-    }
-
-    .mat-error {
-        font-size: 0.8rem;
-        color: #d32f2f;
-        margin-top: 0.25rem;
-        min-height: 1.2em;
-        transition: color 0.25s;
-    }
-
-    .mat-form-field-outline {
-        border-radius: 0.8rem !important; // Bordes redondeados pro
-        transition: border-color 0.2s;
-    }
+.field.remember-inline .p-checkbox {
+  display: inline-flex;
+  align-items: center;
 }
 
-// Si hay error en el input, marca el borde en rojo
-mat-form-field.mat-form-field-invalid .mat-form-field-outline {
-    border-color: #d32f2f !important; // Rojo error accesible
+.forgot-inline {
+  margin-left: 0.75rem;
+  white-space: nowrap; /* evita salto de línea del enlace */
+  text-decoration: none;
+  color: #6b7280;
+  font-weight: 600;
+}
+.forgot-inline:hover {
+  text-decoration: underline;
+  color: #0284c7;
 }
 
-// =============================
-// CHECKBOX DE "RECUÉRDAME"
-// =============================
-.remember-checkbox {
-    margin-bottom: 0.1rem;
-    font-size: 0.95rem;
+.auth-form.is-loading {
+  pointer-events: none;
 }
 
-// =============================
-// BOTÓN ENTRAR
-// =============================
-button[type="submit"] {
-    margin-top: 0.5rem;
-    transition: box-shadow 0.18s;
-    box-shadow: 0 2px 8px rgba(2, 132, 199, 0.10);
-
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 0.3rem;
-
-    &:hover:enabled {
-        box-shadow: 0 4px 14px rgba(2, 132, 199, 0.15);
-        filter: brightness(1.07);
-    }
-}
-
-// =============================
-// SPINNER DE CARGA (AL ENTRAR)
-// =============================
-mat-progress-spinner {
-    animation: fadeInSpinner 0.3s;
-}
-
-@keyframes fadeInSpinner {
-    from {
-        opacity: 0;
-        transform: scale(0.85);
-    }
-
-    to {
-        opacity: 1;
-        transform: scale(1);
-    }
-}
-
-// =============================
-// SNACKBARS DE FEEDBACK (ÉXITO/ERROR)
-// =============================
-.snack-success {
-    background-color: #43a047 !important; // Verde éxito
-    color: #fff !important;
-}
-
-.snack-error {
-    background-color: #d32f2f !important; // Rojo error
-    color: #fff !important;
-}
-
-// =============================
-// MENSAJE DE ERROR GENERAL LOGIN
-// =============================
-.login-error {
-    color: #d32f2f;
-    margin-bottom: 1rem;
-    text-align: center;
-    font-size: 1rem;
-    font-weight: 500;
-}
-
-// =============================
-// ENLACE A REGISTRO
-// =============================
-mat-card-actions {
-    text-align: center;
-    margin-top: 0.5rem;
-
-    p {
-        margin-bottom: 0.1rem;
-        font-size: 1rem;
-
-        a {
-            color: #0284c7;
-            font-weight: 600;
-            text-decoration: none;
-            transition: text-decoration 0.2s;
-
-            &:hover {
-                text-decoration: underline;
-            }
-        }
-    }
+/* Utilidad para contenido solo para lectores de pantalla */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
 }

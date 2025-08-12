@@ -1,91 +1,168 @@
-<div class="register-container">
-    <mat-card class="register-card">
-        <!-- Logo/avatar 
-        <div class="header-avatar" aria-hidden="true">
-            <img src="assets/logo-register.webp" alt="Logo" width="64" height="64" />
+<!-- p-toast debe existir en la vista (o en el AppComponent) para mostrar notificaciones -->
+<p-toast></p-toast>
+
+<!-- Shell centrado: aporta el layout y el padding fluido -->
+<div class="auth-shell">
+  <!-- Card PrimeNG. styleClass conecta con nuestros estilos (.auth-card, .auth-card-scroll) -->
+  <p-card styleClass="auth-card auth-card-scroll">
+    <!-- HEADER de la card (logo + títulos). No forma parte del formulario -->
+    <ng-template pTemplate="header">
+      <div class="auth-header">
+        <div class="brand" aria-hidden="true">
+          <img src="assets/logo-register.webp" alt="TimeLogic" />
         </div>
--->
-        <mat-card-header class="custom-header">
-            <mat-card-title class="header-title">Crear cuenta</mat-card-title>
-            <mat-card-subtitle class="header-subtitle">
-                Completa el formulario para registrarte
-            </mat-card-subtitle>
-        </mat-card-header>
+        <h1 class="title">Crear cuenta</h1>
+        <p class="subtitle">Completa el formulario para registrarte</p>
+      </div>
+    </ng-template>
 
-        <mat-card-content class="register-content-scroll">
-            <form [formGroup]="registerForm" (ngSubmit)="onSubmit()" autocomplete="off" novalidate>
-                <!-- Nombre -->
-                <mat-form-field appearance="outline" class="full-width">
-                    <mat-icon matPrefix>person</mat-icon>
-                    <input matInput placeholder="Tu nombre" formControlName="name" autocomplete="name" />
-                    <mat-error *ngIf="name.invalid && (name.dirty || name.touched)">
-                        {{ getNameError() }}
-                    </mat-error>
-                </mat-form-field>
+    <!-- FORMULARIO: reactivo, sin validación nativa del navegador -->
+    <form
+      class="auth-form"
+      [formGroup]="registerForm"
+      (ngSubmit)="onSubmit()"
+      novalidate
+    >
+      <!-- ======= Campo: Nombre ======= -->
+      <div class="field">
+        <!-- Patrón de campo con icono + separador + label flotante
+             Clases clave:
+             - p-input-icon-left  → posiciona <i> como icono a la izquierda
+             - with-separator     → dibuja la línea vertical (nuestro SCSS)
+             - p-float-label      → convierte el <label> en “floating label” -->
+        <span class="p-input-icon-left p-float-label with-separator">
+          <i class="pi pi-user"></i>
 
-                <!-- Email -->
-                <mat-form-field appearance="outline" class="full-width">
-                    <mat-icon matPrefix>mail</mat-icon>
-                    <input matInput placeholder="Correo electrónico" formControlName="email" autocomplete="email" />
-                    <mat-error *ngIf="email.invalid && (email.dirty || email.touched)">
-                        {{ getEmailError() }}
-                    </mat-error>
-                </mat-form-field>
+          <!-- Input enlazado al formControl "name".
+               Accesibilidad:
+               - id + label[for] → relación explícita
+               - aria-invalid    → expone error a lectores de pantalla
+               - aria-describedby→ enlaza con el <small> de error -->
+          <input
+            id="reg-name"
+            pInputText
+            type="text"
+            formControlName="name"
+            [attr.aria-invalid]="name.invalid"
+            aria-describedby="name-err"
+          />
 
-                <!-- Contraseña -->
-                <mat-form-field appearance="outline" class="full-width">
-                    <mat-icon matPrefix>lock</mat-icon>
-                    <input matInput [type]="hidePassword ? 'password' : 'text'" placeholder="Contraseña"
-                        formControlName="password" autocomplete="new-password" />
-                    <button mat-icon-button matSuffix type="button" tabindex="-1" (click)="hidePassword = !hidePassword"
-                        [attr.aria-label]="hidePassword ? 'Mostrar contraseña' : 'Ocultar contraseña'">
-                        <mat-icon>{{ hidePassword ? 'visibility_off' : 'visibility' }}</mat-icon>
-                    </button>
-                    <mat-error *ngIf="password.invalid && (password.dirty || password.touched)">
-                        {{ getPasswordError() }}
-                    </mat-error>
-                </mat-form-field>
+          <label for="reg-name">Tu nombre</label>
+        </span>
 
-                <!-- Fortaleza contraseña -->
-                <div *ngIf="password.value && (password.dirty || password.touched)" class="password-strength"
-                    [ngClass]="passwordStrength.toLowerCase()">
-                    Fortaleza: {{ passwordStrength }}
-                </div>
+        <!-- Mensaje de error: solo aparece si el control es inválido y ha sido tocado/dirty -->
+        <small
+          id="name-err"
+          class="p-error"
+          *ngIf="name.invalid && (name.dirty || name.touched)"
+        >
+          {{ getNameError() }}
+        </small>
+      </div>
 
-                <!-- Repetir contraseña -->
-                <mat-form-field appearance="outline" class="full-width">
-                    <mat-icon matPrefix>lock</mat-icon>
-                    <input matInput [type]="hideRepeatPassword ? 'password' : 'text'" placeholder="Repite la contraseña"
-                        formControlName="repeatPassword" autocomplete="new-password" />
-                    <button mat-icon-button matSuffix type="button" tabindex="-1"
-                        (click)="hideRepeatPassword = !hideRepeatPassword"
-                        [attr.aria-label]="hideRepeatPassword ? 'Mostrar contraseña' : 'Ocultar contraseña'">
-                        <mat-icon>{{ hideRepeatPassword ? 'visibility_off' : 'visibility' }}</mat-icon>
-                    </button>
-                    <mat-error
-                        *ngIf="(repeatPassword.invalid && (repeatPassword.dirty || repeatPassword.touched)) || registerForm.hasError('notMatching')">
-                        {{ getRepeatPasswordError() }}
-                    </mat-error>
-                </mat-form-field>
+      <!-- ======= Campo: Email ======= -->
+      <div class="field">
+        <span class="p-input-icon-left p-float-label with-separator">
+          <i class="pi pi-envelope"></i>
 
-                <button mat-raised-button color="primary" class="full-width" type="submit" form="registerForm"
-                    [disabled]="registerForm.invalid || loading">
-                    <ng-container *ngIf="!loading">Registrarse</ng-container>
-                    <ng-container *ngIf="loading">
-                        <mat-progress-spinner mode="indeterminate" diameter="20" color="primary"
-                            style="vertical-align: middle;">
-                        </mat-progress-spinner>
-                        <span class="ml-2">Registrando...</span>
-                    </ng-container>
-                </button>
-            </form>
-        </mat-card-content>
+          <input
+            id="reg-email"
+            pInputText
+            type="email"
+            formControlName="email"
+            [attr.aria-invalid]="email.invalid"
+            aria-describedby="email-err"
+          />
 
-        <mat-card-actions class="text-center">
-            <p>
-                ¿Ya tienes cuenta?
-                <a routerLink="/auth/login">Inicia sesión</a>
-            </p>
-        </mat-card-actions>
-    </mat-card>
+          <label for="reg-email">Correo electrónico</label>
+        </span>
+
+        <small
+          id="email-err"
+          class="p-error"
+          *ngIf="email.invalid && (email.dirty || email.touched)"
+        >
+          {{ getEmailError() }}
+        </small>
+      </div>
+
+      <!-- ======= Campo: Contraseña ======= -->
+      <div class="field">
+        <span class="p-input-icon-left p-float-label with-separator">
+          <i class="pi pi-lock"></i>
+
+          <!-- p-password genera su propio <input> interno.
+               - inputId conecta el label flotante
+               - [feedback]="true" activa el meter de fuerza
+               - appendTo="body" evita que el popup se recorte por overflow en la card
+               - [toggleMask]="true" añade el ojo para mostrar/ocultar -->
+          <p-password
+            inputId="reg-pass"
+            formControlName="password"
+            [feedback]="true"
+            appendTo="body"
+            [toggleMask]="true"
+          ></p-password>
+
+          <label for="reg-pass">Contraseña</label>
+        </span>
+
+        <small
+          class="p-error"
+          *ngIf="password.invalid && (password.dirty || password.touched)"
+        >
+          {{ getPasswordError() }}
+        </small>
+      </div>
+
+      <!-- ======= Campo: Repite contraseña ======= -->
+      <div class="field">
+        <span class="p-input-icon-left p-float-label with-separator">
+          <i class="pi pi-lock"></i>
+
+          <p-password
+            inputId="reg-pass2"
+            formControlName="repeatPassword"
+            [feedback]="false"
+            appendTo="body"
+            [toggleMask]="true"
+          ></p-password>
+
+          <label for="reg-pass2">Repite la contraseña</label>
+        </span>
+
+        <!-- También comprobamos el error de formulario "notMatching" (validador de grupo) -->
+        <small
+          class="p-error"
+          *ngIf="
+            (repeatPassword.invalid &&
+              (repeatPassword.dirty || repeatPassword.touched)) ||
+            registerForm.hasError('notMatching')
+          "
+        >
+          {{ getRepeatPasswordError() }}
+        </small>
+      </div>
+
+      <!-- ======= Submit ======= -->
+      <!-- Botón PrimeNG con estado de carga.
+           - [loading] muestra spinner accesible
+           - [disabled] bloquea si el form es inválido o está procesando -->
+      <button
+        pButton
+        type="submit"
+        class="auth-submit"
+        [loading]="loading()"
+        [disabled]="registerForm.invalid || loading()"
+        [label]="loading() ? 'Registrando…' : 'Registrarse'"
+      ></button>
+    </form>
+
+    <!-- FOOTER informativo -->
+    <ng-template pTemplate="footer">
+      <div class="auth-footer">
+        ¿Ya tienes cuenta? <a routerLink="/auth/login">Inicia sesión</a>
+      </div>
+    </ng-template>
+  </p-card>
 </div>

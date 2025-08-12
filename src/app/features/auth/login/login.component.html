@@ -1,91 +1,156 @@
-<!-- =========================
-  CONTENEDOR PRINCIPAL LOGIN
-========================== -->
-<div class="login-container">
+<!-- Host de toasts de PrimeNG. Debe existir en la vista (o AppComponent) para que MessageService muestre notificaciones -->
+<p-toast></p-toast>
 
-    <!-- =========================
-    CARD LOGIN (Material)
-  ========================== -->
-    <mat-card class="login-card">
-
-        <!-- ===============
-      AVATAR / LOGO
-
-        <div class="header-avatar">
-            <img src="assets/logo-register.webp" alt="Logo" width="48" height="48">
+<!-- Shell: centra la tarjeta y da padding fluido. Estilos en el partial auth.scss -->
+<div class="auth-shell">
+  <!-- p-card con clases de estilo propias (.auth-card, .auth-card-scroll) -->
+  <p-card styleClass="auth-card auth-card-scroll">
+    <!-- HEADER de la card: branding + título -->
+    <ng-template pTemplate="header">
+      <div class="auth-header">
+        <!-- Imagen decorativa; aria-hidden para no repetir contenido -->
+        <div class="brand" aria-hidden="true">
+          <img src="assets/logo-register.webp" alt="TimeLogic" />
         </div>
-    ================ -->
-        <!-- ===============
-      HEADER: TÍTULO Y SUBTÍTULO
-    ================ -->
-        <mat-card-header class="custom-header">
-            <mat-card-title class="header-title">Iniciar sesión</mat-card-title>
-            <mat-card-subtitle class="header-subtitle">Accede a tu cuenta para continuar</mat-card-subtitle>
-        </mat-card-header>
+        <h1 class="title">Iniciar sesión</h1>
+        <p class="subtitle">Accede con tu cuenta</p>
+      </div>
+    </ng-template>
 
-        <!-- ===============
-      CUERPO: FORMULARIO
-    ================ -->
-        <mat-card-content>
-            <!-- Mensaje de error general -->
-            <mat-error *ngIf="errorMessage" class="login-error">
-                {{ errorMessage }}
-            </mat-error>
+    <!-- Mensaje de error global visual -->
+    <p-message
+      *ngIf="errorMessage"
+      severity="error"
+      [text]="errorMessage"
+      class="message-global"
+      [escape]="true"
+    >
+    </p-message>
 
-            <!-- ====== FORMULARIO LOGIN ====== -->
-            <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
-                <!-- === EMAIL === -->
-                <mat-form-field appearance="outline" class="full-width">
-                    <mat-icon matPrefix>mail</mat-icon>
-                    <input matInput type="email" autocomplete="username" placeholder="tu@ejemplo.com"
-                        formControlName="email" />
-                    <mat-error *ngIf="email.invalid && email.touched">
-                        {{ getEmailError() }}
-                    </mat-error>
-                </mat-form-field>
+    <!-- Live region: anuncia el error a lectores de pantalla, incluso si el texto visual no cambia de foco -->
+    <span class="sr-only" aria-live="assertive" aria-atomic="true">
+      {{ errorMessage }}
+    </span>
 
-                <!-- === CONTRASEÑA === -->
-                <mat-form-field appearance="outline" class="full-width">
-                    <mat-icon matPrefix>lock</mat-icon>
-                    <input matInput [type]="hidePassword ? 'password' : 'text'" autocomplete="current-password"
-                        placeholder="Tu contraseña" formControlName="password">
-                    <!-- Botón para mostrar/ocultar contraseña -->
-                    <button mat-icon-button matSuffix type="button" tabindex="-1" (click)="togglePassword()"
-                        [attr.aria-label]="hidePassword ? 'Mostrar contraseña' : 'Ocultar contraseña'">
-                        <mat-icon>{{ hidePassword ? 'visibility_off' : 'visibility' }}</mat-icon>
-                    </button>
-                    <mat-error *ngIf="password.invalid && password.touched">
-                        {{ getPasswordError() }}
-                    </mat-error>
-                </mat-form-field>
+    <!-- FORMULARIO (reactivo) -->
+    <!-- aria-busy + clase is-loading mejoran la UX: marcan ocupado y bloquean interacciones accidentales -->
+    <form
+      class="auth-form"
+      [attr.aria-busy]="loading()"
+      [class.is-loading]="loading()"
+      [formGroup]="loginForm"
+      (ngSubmit)="onSubmit()"
+      novalidate
+    >
+      <!-- ===== Campo: Email ===== -->
+      <!-- Patrón de campo: icono a la izquierda + separador + label flotante -->
+      <div class="field">
+        <span class="p-input-icon-left p-float-label with-separator">
+          <i class="pi pi-envelope"></i>
 
-                <!-- === CHECKBOX RECUÉRDAME === -->
-                <mat-checkbox formControlName="rememberMe" class="remember-checkbox">
-                    Recuérdame
-                </mat-checkbox>
+          <!-- Control reactivo + atributos de accesibilidad -->
+          <input
+            id="login-email"
+            pInputText
+            type="email"
+            formControlName="email"
+            autocomplete="username"
+            inputmode="email"
+            autocapitalize="none"
+            autocorrect="off"
+            spellcheck="false"
+            [attr.aria-invalid]="email.invalid || null"
+            aria-describedby="login-email-err"
+            [disabled]="loading()"
+            autofocus
+          />
 
-                <!-- === BOTÓN ENTRAR === -->
-                <button mat-raised-button color="primary" class="full-width" type="submit"
-                    [disabled]="loginForm.invalid || loading">
-                    <ng-container *ngIf="!loading">Entrar</ng-container>
-                    <ng-container *ngIf="loading">
-                        <mat-progress-spinner diameter="20" mode="indeterminate" color="primary"
-                            style="vertical-align: middle;"></mat-progress-spinner>
-                        <span style="margin-left: 0.6rem;">Entrando...</span>
-                    </ng-container>
-                </button>
-            </form>
-        </mat-card-content>
+          <label for="login-email">Correo electrónico</label>
+        </span>
 
-        <!-- ===============
-      ACCIONES / ENLACE REGISTRO
-    ================ -->
-        <mat-card-actions class="text-center">
-            <p>
-                ¿No tienes cuenta?
-                <a routerLink="/auth/register">Regístrate</a>
-            </p>
-        </mat-card-actions>
+        <!-- Mensaje de error del campo email -->
+        <small
+          id="login-email-err"
+          class="p-error"
+          *ngIf="email.invalid && (email.touched || email.dirty)"
+        >
+          {{
+            email.hasError("required")
+              ? "El correo es obligatorio."
+              : "Correo no válido."
+          }}
+        </small>
+      </div>
 
-    </mat-card>
+      <!-- ===== Campo: Contraseña ===== -->
+      <div class="field">
+        <!-- .stretch: forzamos que el wrapper ocupe 100% (ver SCSS) -->
+        <span class="p-input-icon-left p-float-label with-separator stretch">
+          <i class="pi pi-lock"></i>
+
+          <!-- p-password renderiza su propio <input>. appendTo evita clipping del popup -->
+          <p-password
+            inputId="login-pass"
+            formControlName="password"
+            [feedback]="false"
+            [toggleMask]="true"
+            appendTo="body"
+            [disabled]="loading()"
+            [style]="{ display: 'block', width: '100%' }"
+          >
+          </p-password>
+
+          <label for="login-pass">Contraseña</label>
+        </span>
+
+        <!-- Mensaje de error del campo contraseña -->
+        <small
+          id="login-pass-err"
+          class="p-error"
+          *ngIf="password.invalid && (password.touched || password.dirty)"
+        >
+          La contraseña es obligatoria.
+        </small>
+      </div>
+
+      <!-- ===== Recordarme + Olvido ===== -->
+      <!-- En una sola línea. El label del checkbox lo pinta el propio p-checkbox -->
+      <div class="field remember-inline">
+        <p-checkbox
+          inputId="rememberMe"
+          formControlName="rememberMe"
+          [binary]="true"
+          [disabled]="loading()"
+          label="Recordarme"
+        >
+        </p-checkbox>
+
+        <a
+          class="forgot-inline"
+          routerLink="/auth/forgot-password"
+          aria-label="Recuperar contraseña"
+        >
+          ¿Olvidaste tu contraseña?
+        </a>
+      </div>
+
+      <!-- ===== Submit ===== -->
+      <!-- Botón PrimeNG con spinner integrado mientras loading() es true -->
+      <button
+        pButton
+        type="submit"
+        class="auth-submit"
+        [loading]="loading()"
+        [disabled]="loginForm.invalid || loading()"
+        [label]="loading() ? 'Entrando…' : 'Entrar'"
+      ></button>
+    </form>
+
+    <!-- FOOTER de la card -->
+    <ng-template pTemplate="footer">
+      <div class="auth-footer">
+        ¿No tienes cuenta? <a routerLink="/auth/register">Regístrate</a>
+      </div>
+    </ng-template>
+  </p-card>
 </div>
