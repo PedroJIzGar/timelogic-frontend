@@ -19,7 +19,7 @@
 
 import { Component, ElementRef, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Router, RouterModule } from '@angular/router';
+import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { FormBuilder, Validators, ReactiveFormsModule } from '@angular/forms';
 
 // PrimeNG
@@ -71,6 +71,7 @@ export class LoginComponent {
   private router = inject(Router);
   private messageService = inject(MessageService);
   private host = inject(ElementRef<HTMLElement>);
+  private route = inject(ActivatedRoute);
 
   /**
    * Estado de carga del submit.
@@ -181,7 +182,7 @@ export class LoginComponent {
       // Recomendado: pasar preferencia de persistencia al servicio (Firebase setPersistence)
       // await this.authService.login(email, password, { remember: rememberMe });
 
-      await this.authService.login(email, password);
+      await this.authService.login(email, password, { remember: rememberMe });
 
       if (rememberMe) localStorage.setItem('rememberedEmail', email);
       else localStorage.removeItem('rememberedEmail');
@@ -193,7 +194,8 @@ export class LoginComponent {
         life: 2000,
       });
 
-      this.router.navigate(['/dashboard'], { replaceUrl: true });
+      const returnUrl = this.route.snapshot.queryParamMap.get('returnUrl') ?? 'dashboard';
+      this.router.navigateByUrl(returnUrl, { replaceUrl: true });
     } catch (error: any) {
       const friendly =
         humanizeFirebaseError?.(error?.code) ??

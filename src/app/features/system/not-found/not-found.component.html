@@ -1,0 +1,23 @@
+<div class="auth-shell">
+  <p-card styleClass="auth-card auth-card-scroll">
+    <ng-template pTemplate="header">
+      <div class="auth-header">
+      </div>
+    </ng-template>
+
+    <!-- “Pantalla” con tu GIF -->
+    <section class="canvas" role="img" aria-label="Página no encontrada">
+      <div class="canvas-inner">
+        
+        <div class="hero">
+            <h1 class="title">404</h1>
+          <!-- Usa el GIF que has pasado -->
+          <img src="/assets/bg.gif" alt="" aria-hidden="true" />
+        </div>
+        <h1 class="subtitle">Parece que te has perdido</h1>
+        <p class="msg">La página que buscas no está disponible.</p>
+        <button pButton class="btn-primary" (click)="goHome()" label="Volver"></button>
+      </div>
+    </section>
+  </p-card>
+</div>

@@ -1,0 +1,84 @@
+@use '../../../../styles/partials/auth' as auth;
+@include auth.auth-page();
+
+/* Compacto, sin borde punteado y con 403 grande */
+.canvas {
+    padding: clamp(6px, 1.2vw, 12px) clamp(8px, 1.6vw, 14px) clamp(10px, 1.8vw, 16px);
+}
+
+.canvas-inner {
+    background: #fff;
+    padding: clamp(12px, 1.8vw, 16px);
+    display: grid;
+    gap: 8px;
+    justify-items: center;
+}
+
+.hero {
+    position: relative;
+    width: min(640px, 100%);
+    aspect-ratio: 16 / 9;
+    background: #fff;
+    border-radius: 12px;
+    overflow: hidden;
+    display: grid;
+    place-items: center;
+    box-shadow: inset 0 1px 0 rgba(17, 24, 39, .03);
+}
+
+.hero .code {
+    position: absolute;
+    top: clamp(8px, 1.5vw, 14px);
+    left: 50%;
+    transform: translateX(-50%);
+    margin: 0;
+    font-weight: 800;
+    font-size: clamp(44px, 7vw, 88px);
+    line-height: 1;
+    color: #111827;
+}
+
+.hero img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+}
+
+.subtitle {
+    margin: 6px 0 2px;
+    font-size: clamp(18px, 2.8vw, 24px);
+    font-weight: 700;
+    color: #111827;
+    text-align: center;
+}
+
+.msg {
+    margin: 0 0 6px;
+    color: #6b7280;
+    text-align: center;
+    font-size: clamp(14px, 2.6vw, 16px);
+}
+
+.cta {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: .75rem;
+    width: min(420px, 100%);
+}
+
+.btn-primary.p-button {
+    background: #0284c7;
+    border-color: #0284c7;
+    font-weight: 700;
+}
+
+.btn-primary.p-button:enabled:hover {
+    filter: brightness(1.05);
+}
+
+.btn-ghost.p-button {
+    background: #fff;
+    color: #111827;
+    border: 1px solid #e5e7eb;
+    font-weight: 700;
+}

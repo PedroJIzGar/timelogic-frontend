@@ -13,6 +13,7 @@ import {
   getIdToken,
   getIdTokenResult,
   sendPasswordResetEmail,
+  sendEmailVerification,
 } from '@angular/fire/auth';
 import { BehaviorSubject, firstValueFrom, ReplaySubject } from 'rxjs';
 
@@ -97,4 +98,17 @@ export class AuthService {
     // pero en UI devolvemos mensaje genérico para no filtrar si existe o no.
     await sendPasswordResetEmail(this.auth, email);
   }
+
+    /** ¿El usuario actual tiene el email verificado? */
+  isEmailVerified(): boolean {
+    return !!this.auth.currentUser?.emailVerified;
+  }
+
+  /** Envía (o reenvía) correo de verificación al usuario logueado. */
+  async sendEmailVerificationEmail(): Promise<void> {
+    const user = this.auth.currentUser;
+    if (!user) throw new Error('No user logged in');
+    await sendEmailVerification(user);
+  }
+  
 }

@@ -193,20 +193,19 @@ export class RegisterComponent {
     try {
       // 1) Registro en Firebase (solo auth). No guardamos `name` aquí.
       await this.auth.register(email, password);
-
+      await this.auth.sendEmailVerificationEmail();
       // 2) Cuando exista backend:
       // const idToken = await this.auth.getIdToken();
       // await this.auth.bootstrapProfile({ name }, idToken);
 
-      // Feedback de éxito
       this.messages.add({
         severity: 'success',
         summary: 'Registro correcto',
-        life: 2200,
+        detail: 'Te hemos enviado un enlace de verificación.',
+        life: 3000,
       });
-
-      // Navegación: evitamos que el usuario vuelva al form tras registrarse
-      this.router.navigate(['/auth/login'], { replaceUrl: true });
+      
+      this.router.navigate(['/auth/verify-email'], { replaceUrl: true });
     } catch (e: any) {
       // Mapeo de errores de Firebase a mensajes amigables
       this.messages.add({
