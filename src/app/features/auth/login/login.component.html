@@ -61,7 +61,6 @@
             spellcheck="false"
             [attr.aria-invalid]="email.invalid || null"
             aria-describedby="login-email-err"
-            [disabled]="loading()"
             autofocus
           />
 
@@ -95,7 +94,6 @@
             [feedback]="false"
             [toggleMask]="true"
             appendTo="body"
-            [disabled]="loading()"
             [style]="{ display: 'block', width: '100%' }"
           >
           </p-password>
@@ -120,7 +118,6 @@
           inputId="rememberMe"
           formControlName="rememberMe"
           [binary]="true"
-          [disabled]="loading()"
           label="Recordarme"
         >
         </p-checkbox>

@@ -163,58 +163,64 @@ export class LoginComponent {
    * 5. Muestra toast y navega a `/dashboard` usando `replaceUrl`.
    * 6. En error: mapea a mensaje amigable, anuncia por live region y muestra toast.
    */
-  async onSubmit(): Promise<void> {
-    if (this.loginForm.invalid) {
-      this.loginForm.markAllAsTouched();
-      this.focusFirstInvalid();
-      return;
-    }
-
-    this.loading.set(true);
-    this.errorMessage = null;
-
-    const raw = this.loginForm.value;
-    const email = (raw.email ?? '').toString().trim().toLowerCase();
-    const password = (raw.password ?? '').toString().trim();
-    const rememberMe = !!raw.rememberMe;
-
-    try {
-      // Recomendado: pasar preferencia de persistencia al servicio (Firebase setPersistence)
-      // await this.authService.login(email, password, { remember: rememberMe });
-
-      await this.authService.login(email, password, { remember: rememberMe });
-
-      if (rememberMe) localStorage.setItem('rememberedEmail', email);
-      else localStorage.removeItem('rememberedEmail');
-
-      this.messageService.add({
-        severity: 'success',
-        summary: 'Login correcto',
-        detail: 'Bienvenido de nuevo',
-        life: 2000,
-      });
-
-      const returnUrl = this.route.snapshot.queryParamMap.get('returnUrl') ?? 'dashboard';
-      this.router.navigateByUrl(returnUrl, { replaceUrl: true });
-    } catch (error: any) {
-      const friendly =
-        humanizeFirebaseError?.(error?.code) ??
-        'Correo o contraseña incorrectos';
-
-      // Para que el lector lo anuncie también si se repite el mismo texto:
-      this.errorMessage = null;
-      setTimeout(() => (this.errorMessage = friendly));
-
-      this.messageService.add({
-        severity: 'error',
-        summary: 'No se pudo iniciar sesión',
-        detail: friendly,
-        life: 4000,
-      });
-
-      console.error('Login error:', error);
-    } finally {
-      this.loading.set(false);
-    }
+async onSubmit(): Promise<void> {
+  if (this.loginForm.invalid) {
+    this.loginForm.markAllAsTouched();
+    this.focusFirstInvalid();
+    return;
   }
+
+  this.loading.set(true);
+  this.errorMessage = null;
+
+  // ✅ Deshabilita todo el formulario desde el modelo
+  this.loginForm.disable({ emitEvent: false });
+
+  const raw = this.loginForm.value;
+  const email = (raw.email ?? '').toString().trim().toLowerCase();
+  const password = (raw.password ?? '').toString().trim();
+  const rememberMe = !!raw.rememberMe;
+
+  try {
+    // Opción A: si tu AuthService aún recibe SOLO (email, password)…
+    // await this.authService.login(email, password);
+
+    // Opción B (recomendada): pasar preferencia de persistencia
+    // Implementa la firma en el servicio: login(email, password, { remember?: boolean })
+    await this.authService.login(email, password, { remember: rememberMe });
+
+    if (rememberMe) localStorage.setItem('rememberedEmail', email);
+    else localStorage.removeItem('rememberedEmail');
+
+    this.messageService.add({
+      severity: 'success',
+      summary: 'Login correcto',
+      detail: 'Bienvenido de nuevo',
+      life: 2000,
+    });
+
+    const returnUrl =
+      this.route.snapshot.queryParamMap.get('returnUrl') ?? 'dashboard';
+    this.router.navigateByUrl(returnUrl, { replaceUrl: true });
+  } catch (error: any) {
+    const friendly =
+      humanizeFirebaseError?.(error?.code) ?? 'Correo o contraseña incorrectos';
+
+    // Fuerza re-anuncio del live region aunque el texto se repita
+    this.errorMessage = null;
+    setTimeout(() => (this.errorMessage = friendly));
+
+    this.messageService.add({
+      severity: 'error',
+      summary: 'No se pudo iniciar sesión',
+      detail: friendly,
+      life: 4000,
+    });
+    console.error('Login error:', error);
+  } finally {
+    // ✅ Rehabilita el formulario al terminar
+    this.loginForm.enable({ emitEvent: false });
+    this.loading.set(false);
+  }
+}
 }
