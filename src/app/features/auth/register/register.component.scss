@@ -1,0 +1,3 @@
+@use '../../../../styles/partials/auth' as auth; // ajusta la ruta si quieres
+
+@include auth.auth-page();
