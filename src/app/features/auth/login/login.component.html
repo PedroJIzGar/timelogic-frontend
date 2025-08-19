@@ -1,14 +1,10 @@
-<!-- Host de toasts de PrimeNG. Debe existir en la vista (o AppComponent) para que MessageService muestre notificaciones -->
-<p-toast></p-toast>
+<!-- Host de toasts de PrimeNG -->
+<p-toast key="global" position="top-center" styleClass="app-toast"></p-toast>
 
-<!-- Shell: centra la tarjeta y da padding fluido. Estilos en el partial auth.scss -->
 <div class="auth-shell">
-  <!-- p-card con clases de estilo propias (.auth-card, .auth-card-scroll) -->
   <p-card styleClass="auth-card auth-card-scroll">
-    <!-- HEADER de la card: branding + título -->
     <ng-template pTemplate="header">
       <div class="auth-header">
-        <!-- Imagen decorativa; aria-hidden para no repetir contenido -->
         <div class="brand" aria-hidden="true">
           <img src="assets/logo-register.webp" alt="TimeLogic" />
         </div>
@@ -17,23 +13,6 @@
       </div>
     </ng-template>
 
-    <!-- Mensaje de error global visual -->
-    <p-message
-      *ngIf="errorMessage"
-      severity="error"
-      [text]="errorMessage"
-      class="message-global"
-      [escape]="true"
-    >
-    </p-message>
-
-    <!-- Live region: anuncia el error a lectores de pantalla, incluso si el texto visual no cambia de foco -->
-    <span class="sr-only" aria-live="assertive" aria-atomic="true">
-      {{ errorMessage }}
-    </span>
-
-    <!-- FORMULARIO (reactivo) -->
-    <!-- aria-busy + clase is-loading mejoran la UX: marcan ocupado y bloquean interacciones accidentales -->
     <form
       class="auth-form"
       [attr.aria-busy]="loading()"
@@ -42,15 +21,13 @@
       (ngSubmit)="onSubmit()"
       novalidate
     >
-      <!-- ===== Campo: Email ===== -->
-      <!-- Patrón de campo: icono a la izquierda + separador + label flotante -->
+      <!-- Email -->
       <div class="field">
         <span class="p-input-icon-left p-float-label with-separator">
           <i class="pi pi-envelope"></i>
-
-          <!-- Control reactivo + atributos de accesibilidad -->
           <input
             id="login-email"
+            #emailEl
             pInputText
             type="email"
             formControlName="email"
@@ -61,13 +38,9 @@
             spellcheck="false"
             [attr.aria-invalid]="email.invalid || null"
             aria-describedby="login-email-err"
-            autofocus
           />
-
           <label for="login-email">Correo electrónico</label>
         </span>
-
-        <!-- Mensaje de error del campo email -->
         <small
           id="login-email-err"
           class="p-error"
@@ -81,13 +54,10 @@
         </small>
       </div>
 
-      <!-- ===== Campo: Contraseña ===== -->
-      <div class="field">
-        <!-- .stretch: forzamos que el wrapper ocupe 100% (ver SCSS) -->
+      <!-- Password -->
+      <div class="field tight">
         <span class="p-input-icon-left p-float-label with-separator stretch">
           <i class="pi pi-lock"></i>
-
-          <!-- p-password renderiza su propio <input>. appendTo evita clipping del popup -->
           <p-password
             inputId="login-pass"
             formControlName="password"
@@ -95,13 +65,9 @@
             [toggleMask]="true"
             appendTo="body"
             [style]="{ display: 'block', width: '100%' }"
-          >
-          </p-password>
-
+          ></p-password>
           <label for="login-pass">Contraseña</label>
         </span>
-
-        <!-- Mensaje de error del campo contraseña -->
         <small
           id="login-pass-err"
           class="p-error"
@@ -109,18 +75,29 @@
         >
           La contraseña es obligatoria.
         </small>
+
+        <p-message
+          *ngIf="errorMessage"
+          severity="error"
+          [text]="errorMessage"
+          class="message-global"
+          [escape]="true"
+        ></p-message>
+
+        <span class="sr-only" aria-live="assertive" aria-atomic="true">
+          {{ errorMessage }}
+        </span>
+
       </div>
 
-      <!-- ===== Recordarme + Olvido ===== -->
-      <!-- En una sola línea. El label del checkbox lo pinta el propio p-checkbox -->
+      <!-- Recordarme + Olvidé -->
       <div class="field remember-inline">
         <p-checkbox
           inputId="rememberMe"
           formControlName="rememberMe"
           [binary]="true"
           label="Recordarme"
-        >
-        </p-checkbox>
+        ></p-checkbox>
 
         <a
           class="forgot-inline"
@@ -131,8 +108,7 @@
         </a>
       </div>
 
-      <!-- ===== Submit ===== -->
-      <!-- Botón PrimeNG con spinner integrado mientras loading() es true -->
+      <!-- Submit -->
       <button
         pButton
         type="submit"
@@ -143,7 +119,6 @@
       ></button>
     </form>
 
-    <!-- FOOTER de la card -->
     <ng-template pTemplate="footer">
       <div class="auth-footer">
         ¿No tienes cuenta? <a routerLink="/auth/register">Regístrate</a>

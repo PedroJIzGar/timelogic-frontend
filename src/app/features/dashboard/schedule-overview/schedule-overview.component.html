@@ -1,0 +1,77 @@
+<!--
+  ScheduleOverviewComponent (Template)
+  ===================================
+  Tabla accesible con el horario de hoy:
+  - Muestra Empleado, Hora de inicio, Salida, Rol y Estado.
+  - Resalta la fila del turno en curso.
+  - Estructura semántica de tabla con caption y scope.
+
+  Accesibilidad (A11y)
+  --------------------
+  - Landmark <section> con aria-labelledby (scheduleTitle).
+  - <p-table> incluye <caption> describiendo el contenido.
+  - <th scope="col"> para cabecera de columnas.
+  - <th scope="row"> en la columna de Empleado (cabecera de fila).
+  - La fila activa usa aria-current="true".
+  - El chip de estado añade aria-label (“Estado: En turno/Próximo/Finalizado”).
+
+  UX
+  --
+  - Fila actual resaltada con fondo suave y hora en negrita/color primario.
+  - Columna Estado compacta para no romper el layout.
+  - Tabla con responsiveLayout="scroll" para móviles (scroll horizontal contenido).
+-->
+
+<section class="schedule-overview" aria-labelledby="scheduleTitle">
+  <p-card>
+    <div class="header">
+      <h3 id="scheduleTitle" class="title">Horario de hoy</h3>
+      <span class="date">{{ date | date : "fullDate" }}</span>
+    </div>
+
+    <p-table
+      [value]="entriesSorted()"
+      responsiveLayout="scroll"
+      [tableStyle]="{ 'min-width': '620px' }"
+      styleClass="schedule-table"
+      [paginator]="true"
+      [rows]="5"
+      [rowsPerPageOptions]="[5, 10, 20]"
+    >
+      <caption class="sr-only">
+        Listado de turnos del día con empleado, hora de inicio, hora de salida,
+        rol y estado.
+      </caption>
+
+      <ng-template pTemplate="header">
+        <tr>
+          <th scope="col">Empleado</th>
+          <th scope="col">Hora</th>
+          <th scope="col">Salida</th>
+          <th scope="col">Rol</th>
+          <th scope="col" class="state-col">Estado</th>
+        </tr>
+      </ng-template>
+
+      <ng-template pTemplate="body" let-row>
+        <tr
+          [class.current]="getStatus(row) === 'on'"
+          [attr.aria-current]="getStatus(row) === 'on' ? 'true' : null"
+          tabindex="0"
+        >
+          <th scope="row" class="employee">{{ row.employee }}</th>
+          <td class="time">{{ row.start || row.time }}</td>
+          <td class="time">{{ row.end || "—" }}</td>
+          <td class="role">{{ row.role }}</td>
+          <td class="state-col">
+            <p-tag
+              [value]="statusLabel(getStatus(row))"
+              [severity]="statusSeverity(getStatus(row))"
+              [attr.aria-label]="'Estado: ' + statusLabel(getStatus(row))"
+            />
+          </td>
+        </tr>
+      </ng-template>
+    </p-table>
+  </p-card>
+</section>

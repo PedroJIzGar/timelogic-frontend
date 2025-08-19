@@ -1,3 +1,33 @@
-<mat-card>
-    <app-schedule-table [currentDate]="today" [scheduleData]="mockData"></app-schedule-table>
-</mat-card>
+<div class="dashboard grid">
+  <!-- Punch Clock -->
+  <div class="col-12 md:col-4">
+    <app-punch-clock class="h-100"></app-punch-clock>
+  </div>
+
+  <!-- KPI Cards: fila completa-->
+  <div class="col-12 md:col-8">
+    <app-kpi-cards [items]="kpis"></app-kpi-cards>
+  </div>
+
+  <!-- Schedule Overview (2/3 en escritorio)-->
+  <div class="col-12 log:col-8">
+    <app-schedule-overview
+      [date]="today"
+      [entries]="schedule"
+    ></app-schedule-overview>
+  </div>
+
+  <!-- Pending Requests (1/3 en escritorio)-->
+  <div class="col-12 md:col-6">
+    <app-pending-requests
+      [requests]="requests"
+      (approve)="onApproveRequest($event)"
+      (reject)="onRejectRequest($event)"
+    ></app-pending-requests>
+  </div>
+
+  <!-- Assign Task -->
+  <div class="col-12 md:col-6">
+    <app-assign-task></app-assign-task>
+  </div>
+</div>

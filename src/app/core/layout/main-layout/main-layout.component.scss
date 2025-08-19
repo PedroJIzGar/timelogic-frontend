@@ -1,150 +1,341 @@
-html,
-body {
-  margin: 0;
-  padding: 0;
-  height: 100%;
-  font-family: 'Inter', 'Roboto', sans-serif;
-  background-color: #f9fafb;
-  color: #111827;
-  overflow: hidden;
-}
+/* ==========================================================================
+   LAYOUT (App Shell)
+   ----------------------------------------------------------------------------
+   Objetivo:
+   - El LAYOUT NUNCA scrollea (queda fijado a 100vh).
+   - El scroll VIVE sólo en:
+       • `.main` (área de trabajo / dashboard)
+       • `.sidebar-scroll` (panel de navegación)
+   - Compatible con PrimeNG (toolbar, menu, buttons, etc.)
+   - Soporta modo colapsado del sidebar.
 
-.layout-container {
-  height: 100vh;
+   Requisitos globales recomendados (en styles.scss):
+   ---------------------------------------------------------------------------
+   html, body {
+     margin: 0;               // evita scroll "fantasma" por margen del body
+     height: 100%;
+     overflow: hidden;        // asegura que el body no scrollea
+   }
+   ========================================================================== */
+
+/* ==========================================================================
+   TOKENS / CONSTANTES
+   ========================================================================== */
+$mini-item-size: 42px; // Diámetro del item en sidebar colapsado
+$item-radius: 0.75rem; // Radio común para items/links
+
+/* ==========================================================================
+   LAYOUT BASE
+   - Estructura: topbar (fila 1) + contenido (fila 2 → sidebar + main)
+   - El layout está fijado a 100vh y NO genera scroll.
+   ========================================================================== */
+:host {
   display: flex;
   flex-direction: column;
+  height: 100vh; /* alto exacto de viewport */
+  min-height: 0; /* ⬅️ imprescindible para no crecer más de 100vh */
+  overflow: hidden; /* ❌ prohíbe scroll en layout */
 }
 
-mat-sidenav-container {
-  flex: 1;
-  display: flex;
+.app-shell {
+  /* variables para ancho del sidebar */
+  --sidebar-width: 260px;
+  --sidebar-width-collapsed: 72px;
+
+  display: grid;
+  grid-template-rows: auto 1fr; /* topbar + resto (content-area) */
   height: 100%;
-}
+  min-height: 0; /* ⬅️ evita que el grid empuje al host */
+  overflow: hidden; /* ❌ aquí tampoco habrá scroll */
+  background: var(--surface-ground);
 
-.sidenav {
-  width: 220px;
-  height: 100%;
-  display: flex;
-  flex-direction: column;
-  background-color: #f3f4f6;
-  border-right: 1px solid #e5e7eb;
-  overflow: hidden;
-}
-
-.sidenav-content-wrapper {
-  display: flex;
-  flex-direction: column;
-  flex: 1 1 auto;
-  height: calc(100vh - 64px);
-  min-height: 0;
-}
-
-mat-nav-list {
-  flex: 1 1 auto;
-  overflow-y: auto;
-  min-height: 0;
-}
-
-.sidenav-footer {
-  margin-top: auto;
-  padding: 1rem 1.5rem;
-  border-top: 1px solid #cbd5e1;
-  background-color: #f3f4f6;
-  display: flex;
-  align-items: center;
-
-  .profile-icon {
-    margin-right: 8px;
-  }
-
-  .profile-info {
-    display: flex;
-    flex-direction: column;
-
-    .name {
-      font-weight: 600;
-    }
-
-    .email {
-      font-size: 12px;
-      color: #6b7280;
+  &.collapsed {
+    .content-area {
+      grid-template-columns: var(--sidebar-width-collapsed) 1fr;
     }
   }
 }
 
-mat-sidenav-content {
-  display: flex;
-  flex-direction: column;
-  height: 100%;
-  overflow: hidden;
-}
-
+/* ==========================================================================
+   TOPBAR
+   - Se mantiene visualmente fija porque el scroll lo gestiona `.main`.
+   - Si quisieras sticky dentro de un contenedor con scroll, debe ser hijo
+     directo de ese contenedor. En este layout no hace falta tocar nada más.
+   ========================================================================== */
 .topbar {
-  height: 64px;
-  display: flex;
-  align-items: center;
-  background-color: #f3f4f6;
-  color: black;
-  border-bottom: 1px solid #e5e7eb;
-  padding: 0 1.5rem;
-  z-index: 1000;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  border-bottom: 1px solid var(--surface-border);
+
+  .brand {
+    font-weight: 700;
+    margin-left: 0.5rem;
+  }
 }
 
-.content-wrapper {
-  flex: 1;
-  overflow-y: auto;
-  padding: 2rem;
-  background-color: inherit;
+/* ==========================================================================
+   CONTENT-AREA (Fila 2 del grid)
+   - Distribuye: sidebar | main
+   - NO debe scrollear. Da paso al scroll de sus hijos.
+   ========================================================================== */
+.content-area {
+  display: grid;
+  grid-template-columns: var(--sidebar-width) 1fr;
+  min-height: 0; /* ⬅️ vital para que los hijos scrolleen */
+  overflow: hidden; /* ❌ sin scroll aquí */
 }
 
-mat-nav-list, .nav-item {
-  max-width: 100%;
-  overflow: hidden;
+/* ==========================================================================
+   MAIN (área de trabajo)
+   - ÚNICO sitio (junto al sidebar-scroll) donde permitimos scroll vertical
+   - Evita scroll horizontal accidental por tablas anchas
+   ========================================================================== */
+.main {
+  min-width: 0; /* evita que el contenido ancho "rompa" el grid */
+  min-height: 0; /* ⬅️ vital en hijos de grid/flex */
+  padding: 1rem;
+  overflow-y: auto; /* ✅ scroll VERTICAL confinado al main */
+  overflow-x: hidden; /* ❌ nunca scroll horizontal en layout */
 }
 
-.nav-item {
-  display: flex;
-  align-items: center;
-  padding: 10px 16px;
-  font-size: 15px;
-  color: #374151;
-  border-radius: 8px;
-  transition: all 0.2s ease-in-out;
-  overflow: hidden;
-  white-space: nowrap;
-  text-overflow: ellipsis;
+/* ==========================================================================
+   SIDEBAR
+   - Estructura en dos filas: zona scroll + footer fijo
+   - El contenedor padre NO scrollea; solo su hijo `.sidebar-scroll`
+   ========================================================================== */
+.sidebar {
+  display: grid;
+  grid-template-rows: 1fr auto;
+  background: var(--surface-card);
+  border-right: 1px solid var(--surface-border);
+  overflow: hidden; /* ❌ el padre no scrollea */
 
-  mat-icon {
-    margin-right: 12px;
-    font-size: 20px;
-    color: #6b7280;
+  &-scroll {
+    min-height: 0; /* ⬅️ habilita scroll interno */
+    overflow-y: auto; /* ✅ scroll VERTICAL sólo aquí */
+    overflow-x: hidden;
+    padding-bottom: 0.25rem;
   }
 
-  span {
-    font-size: 15px;
-    position: relative;
-    top: -7px;
+  &-footer {
+    border-top: 1px solid var(--surface-border);
+    padding: 0.5rem 0.5rem 0.75rem;
   }
+
+  .footer-btn {
+    gap: 0.5rem;
+
+    .p-avatar {
+      flex: 0 0 auto;
+    }
+  }
+}
+
+/* ==========================================================================
+   PRIME-NG MENU (estado normal)
+   - Apariencia de items del menú
+   ========================================================================== */
+.sidebar-menu {
+  border: 0;
+}
+
+.submenu-title {
+  text-transform: uppercase;
+  font-size: 0.75rem;
+  letter-spacing: 0.5px;
+}
+
+.p-menuitem-link {
+  gap: 0.5rem;
+  border-radius: $item-radius;
+  transition: background 0.15s ease, color 0.15s ease;
 
   &:hover {
-    background-color: #e5e7eb;
-    color: #111827;
-
-    mat-icon {
-      color: #111827;
-    }
+    background: var(--surface-hover);
+    color: var(--text-color);
   }
 
   &.active {
-    background-color: #e0f2fe;
-    color: #0284c7;
+    background: var(--primary-100);
+    color: var(--primary-color);
+  }
 
-    mat-icon {
-      color: #0284c7;
+  > .pi {
+    width: 1.5rem;
+    text-align: center;
+    font-size: 1.25rem;
+  }
+}
+
+/* ==========================================================================
+   MODO COLAPSADO (mini)
+   - Sidebar muestra sólo iconos, con hover circular tipo "icon button"
+   - Los textos/badges/atajos se ocultan
+   ========================================================================== */
+.app-shell.collapsed {
+  .sidebar {
+    .p-submenu-header,
+    .brand-text,
+    .submenu-title,
+    .p-menuitem-text,
+    .badge,
+    .shortcut,
+    .end-text {
+      display: none !important;
+    }
+
+    .start-wrap,
+    .footer-btn,
+    .p-menuitem-link {
+      justify-content: center;
+    }
+
+    .p-menu .p-menuitem {
+      padding: 0.25rem 0;
+    }
+
+    .p-menu .p-menuitem > .p-menuitem-link {
+      width: $mini-item-size;
+      height: $mini-item-size;
+      margin: 4px auto;
+      padding: 0;
+      border-radius: 9999px;
+      justify-content: center;
+      overflow: hidden; /* recorta ripple */
+      position: relative;
+
+      &:hover {
+        background: var(--surface-hover);
+      }
+
+      &.active {
+        background: var(--primary-100);
+        color: var(--primary-color);
+      }
+
+      > .pi {
+        width: auto; /* no reservar ancho */
+        font-size: 1.2rem; /* icono un poco mayor */
+        text-align: center;
+      }
+
+      &:focus-visible {
+        outline: 2px solid var(--primary-color);
+        outline-offset: 2px;
+      }
     }
   }
 }
 
-.spacer {
-  flex: 1 1 auto;
+/* ==========================================================================
+   OVERRIDES PARA PRIME-NG (atravesar encapsulación)
+   - Útil porque PrimeNG pone width: 100% al link
+   - Añade la clase "icon-only" al <a> cuando el sidebar esté colapsado
+   --------------------------------------------------------------------------
+   Ejemplo en plantilla:
+   <a class="p-menuitem-link" [ngClass]="{ 'icon-only': isCollapsed }" ...>
+   ========================================================================== */
+:host ::ng-deep .sidebar .p-menu .p-menuitem .p-menuitem-link.icon-only {
+  width: $mini-item-size !important;
+  height: $mini-item-size !important;
+  margin: 4px auto !important;
+  padding: 0 !important;
+  border-radius: 9999px !important;
+  justify-content: center !important;
+  overflow: hidden;
+  position: relative;
+
+  > .pi {
+    width: auto !important;
+    font-size: 1.2rem;
+    text-align: center;
+  }
+}
+
+/* ==========================================================================
+   TOPBAR: Toolbar Search (fluido, sin media queries)
+   ========================================================================== */
+.topbar {
+  /* Grupos de la toolbar para centrar la búsqueda correctamente */
+  .p-toolbar-group-start,
+  .p-toolbar-group-end {
+    flex: 0 0 auto;
+  }
+  .p-toolbar-group-center {
+    flex: 1 1 0;
+    min-width: 0; /* evita overflow en anchos pequeños */
+    display: flex;
+    justify-content: center;
+  }
+
+  /* Caja de búsqueda “pill” fluida */
+  .searchbox {
+    --sb-h: clamp(40px, 4.2vw, 44px); /* alto */
+    --sb-w: clamp(280px, 45vw, 720px); /* ancho preferido */
+    position: relative;
+    width: min(100%, var(--sb-w));
+    height: var(--sb-h);
+    display: flex;
+    align-items: center;
+
+    > .pi.pi-search {
+      position: absolute;
+      left: calc(var(--sb-h) * 0.32);
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: calc(var(--sb-h) * 0.4);
+      color: var(--text-color-secondary);
+      pointer-events: none;
+    }
+
+    input[pinputtext] {
+      width: 100%;
+      height: 100%;
+      padding-left: calc(var(--sb-h) * 0.32 + var(--sb-h) * 0.4 + 8px);
+      padding-right: calc(var(--sb-h) + 8px);
+      border-radius: 9999px;
+      border: 1px solid var(--surface-border);
+      background: var(--surface-0, #fff);
+      box-shadow: 0 1px 0 rgba(0, 0, 0, 0.02);
+      transition: border-color 0.15s ease, box-shadow 0.15s ease;
+
+      &::placeholder {
+        color: var(--text-color-secondary);
+      }
+
+      &:focus {
+        outline: none;
+        border-color: color-mix(in srgb, var(--primary-color) 35%, transparent);
+        box-shadow: 0 0 0 3px var(--primary-100);
+      }
+    }
+
+    .clear-btn {
+      position: absolute;
+      right: 6px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: calc(var(--sb-h) * 0.73);
+      height: calc(var(--sb-h) * 0.73);
+      border: 0;
+      border-radius: 9999px;
+      background: transparent;
+      display: inline-grid;
+      place-items: center;
+      cursor: pointer;
+
+      i {
+        font-size: calc(var(--sb-h) * 0.38);
+        color: var(--text-color-secondary);
+      }
+      &:hover {
+        background: var(--surface-hover);
+      }
+      &:focus-visible {
+        outline: 2px solid var(--primary-color);
+        outline-offset: 2px;
+      }
+    }
+  }
 }

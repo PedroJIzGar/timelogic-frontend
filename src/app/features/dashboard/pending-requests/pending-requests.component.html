@@ -1,0 +1,122 @@
+<!--
+  PendingRequestsComponent (Template)
+  ==================================
+  Muestra lista de peticiones pendientes con acciones (aprobar/rechazar).
+
+  ✔ Accesibilidad (A11y)
+    - Landmark <section> con aria-labelledby
+    - role="list" y role="listitem" para las filas
+    - aria-label dinámico con resumen de cada petición
+    - Botones con aria-label y title
+    - Iconos decorativos con aria-hidden
+    - aria-live="polite" para avisar cambios
+
+  ✔ UX
+    - Fila clara: info izquierda, acciones derecha
+    - En móvil acciones bajan con media query
+    - Hover/focus con sombra suave
+    - Estado vacío amigable
+-->
+
+<section class="pending-requests" aria-labelledby="pendingRequestsTitle">
+  <h2 id="pendingRequestsTitle" class="sr-only">Peticiones pendientes</h2>
+
+  <p-card header="Peticiones pendientes" styleClass="card">
+    <div
+      class="list"
+      role="list"
+      *ngIf="_items().length; else empty"
+      aria-live="polite"
+    >
+      <div
+        class="row surface-card border-1 surface-border border-round-xl"
+        role="listitem"
+        *ngFor="let r of _items(); trackBy: trackById"
+        tabindex="0"
+        [attr.aria-label]="
+          r.employee +
+          ' – ' +
+          r.type +
+          ', estado: ' +
+          (r.status === 'pending'
+            ? 'Pendiente'
+            : r.status === 'approved'
+            ? 'Aprobada'
+            : 'Rechazada')
+        "
+      >
+        <!-- INFO -->
+        <div class="info">
+          <div class="top">
+            <span class="employee">{{ r.employee }}</span>
+            <p-tag
+              [value]="
+                r.status === 'pending'
+                  ? 'Pendiente'
+                  : r.status === 'approved'
+                  ? 'Aprobada'
+                  : 'Rechazada'
+              "
+              [severity]="statusSeverity(r.status!)"
+              [attr.aria-label]="'Estado: ' + r.status"
+            />
+          </div>
+
+          <div class="meta">
+            <span class="type">{{ r.type }}</span>
+            <span class="dot" aria-hidden="true">•</span>
+            <span class="date" *ngIf="r.submittedAt">{{ r.submittedAt }}</span>
+          </div>
+
+          <div class="notes" *ngIf="r.notes">{{ r.notes }}</div>
+        </div>
+
+        <!-- ACCIONES -->
+        <div class="actions" *ngIf="r.status === 'pending'; else locked">
+          <button
+            pButton
+            icon="pi pi-check"
+            class="p-button-sm p-button-success p-button-rounded"
+            (click)="onApprove(r)"
+            [attr.aria-label]="'Aprobar petición de ' + r.employee"
+            title="Aprobar"
+          ></button>
+          <button
+            pButton
+            icon="pi pi-times"
+            class="p-button-sm p-button-danger p-button-rounded"
+            (click)="onReject(r)"
+            [attr.aria-label]="'Rechazar petición de ' + r.employee"
+            title="Rechazar"
+          ></button>
+        </div>
+
+        <!-- BLOQUEADO -->
+        <ng-template #locked>
+          <div class="locked">
+            <i
+              class="pi"
+              [ngClass]="{
+                'pi-check-circle': r.status === 'approved',
+                'pi-times-circle': r.status === 'rejected'
+              }"
+              aria-hidden="true"
+            ></i>
+            <span class="sr-only">
+              Petición de {{ r.employee }}:
+              {{ r.status === "approved" ? "Aprobada" : "Rechazada" }}
+            </span>
+          </div>
+        </ng-template>
+      </div>
+    </div>
+
+    <!-- ESTADO VACÍO -->
+    <ng-template #empty>
+      <div class="empty">
+        <i class="pi pi-inbox" aria-hidden="true"></i>
+        <p>No hay peticiones pendientes. 🎉</p>
+      </div>
+    </ng-template>
+  </p-card>
+</section>

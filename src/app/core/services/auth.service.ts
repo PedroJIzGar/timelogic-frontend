@@ -32,15 +32,13 @@ import {
   signOut,
   User,
   onIdTokenChanged,
-  setPersistence,
-  browserLocalPersistence,
-  browserSessionPersistence,
   getIdToken,
   getIdTokenResult,
   sendPasswordResetEmail,
   sendEmailVerification,
 } from '@angular/fire/auth';
 import { BehaviorSubject, ReplaySubject } from 'rxjs';
+import { setPersistence, browserLocalPersistence, browserSessionPersistence } from 'firebase/auth';
 
 @Injectable({ providedIn: 'root' })
 export class AuthService {
