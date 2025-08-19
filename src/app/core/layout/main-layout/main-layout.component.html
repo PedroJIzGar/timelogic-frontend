@@ -1,60 +1,119 @@
-<mat-toolbar class="topbar" color="primary">
-  <button *ngIf="isMobile" mat-icon-button (click)="toggleSidenav()" aria-label="Menú">
-    <mat-icon>menu</mat-icon>
-  </button>
-  <span class="title">TimeLogic</span>
-  <span class="spacer"></span>
-  <button mat-icon-button (click)="toggleDarkMode()" aria-label="Cambiar tema">
-    <mat-icon class="rotate-icon" [class.rotate]="darkMode">
-      {{ darkMode ? 'light_mode' : 'dark_mode' }}
-    </mat-icon>
-  </button>
-  <button mat-icon-button (click)="logout()" aria-label="Cerrar sesión">
-    <mat-icon>logout</mat-icon>
-  </button>
-</mat-toolbar>
-
-<mat-sidenav-container class="layout-container">
-  <mat-sidenav #sidenav [mode]="isMobile ? 'over' : 'side'" [opened]="!isMobile || sidenavOpened" class="sidenav">
-    <div class="sidenav-content-wrapper">
-      <mat-nav-list>
-        <a mat-list-item routerLink="/dashboard" routerLinkActive="active" class="nav-item" (click)="onNavItemClick()">
-          <mat-icon>dashboard</mat-icon>
-          <span class="nav-label">Dashboard</span>
-        </a>
-        <a mat-list-item routerLink="/employees" routerLinkActive="active" class="nav-item" (click)="onNavItemClick()">
-          <mat-icon>group</mat-icon>
-          <span class="nav-label">Employees</span>
-        </a>
-        <a mat-list-item routerLink="/schedule" routerLinkActive="active" class="nav-item" (click)="onNavItemClick()">
-          <mat-icon>assignment</mat-icon>
-          <span class="nav-label">Schedule</span>
-        </a>
-        <a mat-list-item routerLink="/tasks" routerLinkActive="active" class="nav-item" (click)="onNavItemClick()">
-          <mat-icon>assignment</mat-icon>
-          <span class="nav-label">Tasks</span>
-        </a>
-        <a mat-list-item routerLink="/requests" routerLinkActive="active" class="nav-item" (click)="onNavItemClick()">
-          <mat-icon>mail</mat-icon>
-          <span class="nav-label">Requests</span>
-        </a>
-        <a mat-list-item routerLink="/settings" routerLinkActive="active" class="nav-item" (click)="onNavItemClick()">
-          <mat-icon>settings</mat-icon>
-          <span class="nav-label">Settings</span>
-        </a>
-      </mat-nav-list>
-
-      <div class="sidenav-footer">
-        <mat-icon class="profile-icon">account_circle</mat-icon>
-        <div class="profile-info">
-          <span class="name">John Doe</span>
-          <span class="email"></span>
-        </div>
+<div class="app-shell" [class.collapsed]="isCollapsed">
+  <!-- ========== TOPBAR ========== -->
+  <p-toolbar class="topbar">
+    <div class="p-toolbar-group-start">
+      @if (!isSmall) {
+      <p-button
+        [icon]="toggleIcon"
+        (onClick)="toggleSidebar()"
+        [rounded]="true"
+        [text]="true"
+        [pTooltip]="isCollapsed ? 'Expandir' : 'Contraer'"
+        tooltipPosition="bottom"
+        aria-label="Toggle sidebar"
+        [attr.aria-expanded]="!isCollapsed"
+      />
+      }
+      <span class="brand">TimeLogic</span>
+    </div>
+    <!-- 🔎 Búsqueda estilo mockup -->
+    <div class="p-toolbar-group-center">
+      <div class="searchbox">
+        <i class="pi pi-search"></i>
+        <!-- Usa [formControl]="searchCtrl" si filtras el menú; si no, deja [(ngModel)] o nada -->
+        <input
+          pInputText
+          type="text"
+          placeholder="Buscar empleados, áreas, documentos..."
+          [formControl]="searchCtrl"
+          aria-label="Buscar en el menú"
+        />
+        <button
+          type="button"
+          class="clear-btn"
+          pRipple
+          *ngIf="searchCtrl?.value"
+          (click)="clearSearch()"
+          aria-label="Limpiar búsqueda"
+        >
+          <i class="pi pi-times"></i>
+        </button>
       </div>
     </div>
-  </mat-sidenav>
 
-  <mat-sidenav-content class="main-content">
-    <router-outlet></router-outlet>
-  </mat-sidenav-content>
-</mat-sidenav-container>
+    <div class="p-toolbar-group-end">
+      <p-button icon="pi pi-bell" [text]="true" />
+      <p-button icon="pi pi-sign-out" [text]="true" (onClick)="logout()" />
+    </div>
+  </p-toolbar>
+
+  <!-- ========== BODY ========== -->
+  <div class="content-area">
+    <!-- ===== SIDEBAR ===== -->
+    <aside class="sidebar" role="navigation" aria-label="Main">
+      <!-- zona scroll (menú) -->
+      <div class="sidebar-scroll">
+        <p-menu [model]="items" styleClass="w-full sidebar-menu">
+          <!-- encabezado de grupo -->
+          <ng-template pTemplate="submenuheader" let-item>
+            <span class="text-primary font-bold submenu-title">{{
+              item.label
+            }}</span>
+          </ng-template>
+
+          <!-- item -->
+          <ng-template pTemplate="item" let-item>
+            <a
+              pRipple
+              class="flex align-items-center p-menuitem-link"
+              [ngClass]="{ 'icon-only': isCollapsed }"
+              [routerLink]="item.routerLink"
+              routerLinkActive="active"
+              [routerLinkActiveOptions]="{ exact: true }"
+              pTooltip="{{ item.label }}"
+              [tooltipDisabled]="!isCollapsed"
+              tooltipPosition="right"
+              [attr.aria-label]="item.label"
+            >
+              <span [class]="item.icon"></span>
+              <span class="p-menuitem-text ml-2 label">{{ item.label }}</span>
+
+              <p-badge
+                *ngIf="item.badge"
+                class="ml-auto badge"
+                [value]="item.badge"
+              />
+            </a>
+          </ng-template>
+        </p-menu>
+      </div>
+
+      <!-- footer fijo abajo -->
+      <div class="sidebar-footer">
+        <button
+          pRipple
+          class="footer-btn p-link w-full flex align-items-center p-2 pl-3 text-color hover:surface-200 border-noround"
+          pTooltip="Cuenta"
+          [tooltipDisabled]="!isCollapsed"
+          tooltipPosition="right"
+          aria-label="Cuenta"
+        >
+          <p-avatar
+            image="https://primefaces.org/cdn/primeng/images/demo/avatar/amyelsner.png"
+            class="mr-2"
+            shape="circle"
+          />
+          <span class="end-text inline-flex flex-column">
+            <span class="font-bold">María Gómez</span>
+            <span class="text-sm">Administradora</span>
+          </span>
+        </button>
+      </div>
+    </aside>
+
+    <!-- ===== MAIN ===== -->
+    <main class="main">
+      <router-outlet></router-outlet>
+    </main>
+  </div>
+</div>

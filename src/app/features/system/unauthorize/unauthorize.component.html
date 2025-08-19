@@ -1,0 +1,20 @@
+<div class="auth-shell">
+    <p-card styleClass="auth-card auth-card-scroll">
+        <section class="canvas" role="img" aria-label="Acceso no autorizado">
+            <div class="canvas-inner">
+                <div class="hero">
+                    <h1 class="code">403</h1>
+                    <img src="/assets/unathorized.gif" alt="" aria-hidden="true" />
+                </div>
+
+                <h2 class="subtitle">Acceso no autorizado</h2>
+                <p class="msg">No tienes permisos para ver esta página.</p>
+
+                <div class="cta">
+                    <button pButton class="btn-primary" (click)="back()" label="Ir al dashboard"></button>
+                    <button pButton class="btn-ghost" (click)="login()" label="Ir a login"></button>
+                </div>
+            </div>
+        </section>
+    </p-card>
+</div>

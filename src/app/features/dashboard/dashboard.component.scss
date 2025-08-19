@@ -1,7 +1,39 @@
-mat-card {
-  margin: 16px;         // Margen exterior para separarlo del resto
-  padding: 24px;        // Espacio interior para que la tabla no esté pegada
-  overflow-x: auto;     // Por si necesitas scroll lateral en móviles
+.dashboard {
+  .col-12.md\:col-4 {
+    display: flex;
+    /* ✅ Estira el hijo a la altura de la fila */
+    align-items: stretch;
+    /* ❌ Nada de centrar vertical aquí */
+    justify-content: flex-start;
+    flex-direction: column;
+    height: 100%;
+    padding: 1rem;
+    box-sizing: border-box;
 
-  display: block;       // Asegura que ocupa el ancho disponible
+    /* El hijo ocupa todo el ancho */
+    > * {
+      width: 100%;
+    }
+  }
 }
+
+.dashboard.grid {
+  /* ✅ Asegura que todas las columnas de la fila tengan la misma altura */
+  align-items: stretch;
+}
+
+.card {
+  border-radius: 1rem;
+}
+
+.placeholder {
+  display: flex;
+  align-items: center;
+  min-height: 48px;
+  font-size: 0.95rem;
+}
+
+.h-100 {
+  height: 100%;
+}
+

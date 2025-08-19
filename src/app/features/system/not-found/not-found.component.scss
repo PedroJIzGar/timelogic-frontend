@@ -1,0 +1,78 @@
+@use '../../../../styles/partials/auth' as auth;
+@include auth.auth-page();
+
+/* 0) Quitamos el header vacío para eliminar ese “aire” arriba */
+.auth-header { display: none; }
+
+/* 1) Contenedor de la “pantalla”: menos padding */
+.canvas {
+  padding: clamp(6px, 1.2vw, 12px) clamp(8px, 1.6vw, 14px) clamp(10px, 1.8vw, 16px);
+}
+
+/* 2) Caja interior: SIN borde punteado, con borde suave y menos gap */
+.canvas-inner {
+  background: #fff;
+  padding: clamp(12px, 1.8vw, 16px);
+  display: grid;
+  gap: 8px;                     /* <- menos separación general */
+  justify-items: center;
+}
+
+/* 3) Marco del GIF + 404 grande dentro */
+.hero {
+  width: min(640px, 100%);
+  aspect-ratio: 16 / 9;
+  background: #fff;
+  border-radius: 12px;
+  overflow: hidden;
+  position: relative;           /* para posicionar el 404 */
+  display: grid;
+  place-items: center;
+  box-shadow: inset 0 1px 0 rgba(17, 24, 39, .03);
+}
+
+/* 404 grande (más que antes) y pegado arriba del marco */
+.hero .title {
+  position: absolute;
+  top: clamp(8px, 1.5vw, 14px);
+  left: 50%;
+  transform: translateX(-50%);
+  margin: 0;
+  font-weight: 700;
+  font-size: clamp(44px, 7vw, 88px);  /* <- más grande */
+  line-height: 1;
+  color: #111827;
+}
+
+.hero img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  image-rendering: -webkit-optimize-contrast;
+}
+
+/* 4) Textos: menos espacio entre líneas */
+.subtitle {
+  margin: 6px 0 2px;            /* <- antes más separado */
+  font-size: clamp(18px, 2.8vw, 24px);
+  font-weight: 700;
+  color: #111827;
+  text-align: center;
+}
+
+.msg {
+  margin: 0 0 6px;              /* <- pegamos más al subtítulo */
+  color: #6b7280;
+  text-align: center;
+  font-size: clamp(14px, 2.6vw, 16px);
+}
+
+/* 5) Botón */
+.btn-primary.p-button {
+  background: #0284c7;
+  border-color: #0284c7;
+  font-weight: 700;
+  max-width: 320px;
+  width: 100%;
+}
+.btn-primary.p-button:enabled:hover { filter: brightness(1.05); }

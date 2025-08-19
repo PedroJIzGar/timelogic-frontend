@@ -1,0 +1,322 @@
+<!--
+  @fileoverview kpi-cards.component.html
+  @description
+  Plantilla de los KPIs principales del dashboard.
+
+  ## KPIs incluidos:
+  - Vacaciones (personas / horas)
+  - Horas gastadas (hoy / semana)
+  - Tareas del día
+  - Peticiones
+  - Incidencias
+
+  ## Accesibilidad (A11y):
+  - Landmark principal: <section> con aria-labelledby="kpiSectionTitle".
+  - Cada KPI se representa en <article> con su propio encabezado (<h4>).
+  - Uso de <p-progressBar> con atributos ARIA (aria-valuenow, aria-valuemin, aria-valuemax).
+  - Texto oculto (.sr-only) para lectores de pantalla que explica progreso o métricas.
+  - tabindex="0" en cada tarjeta → navegable con teclado.
+  - Iconos decorativos marcados con aria-hidden="true".
+
+  ## Dependencias:
+  - PrimeNG <p-progressBar>
+  - PrimeNG <p-tag>
+
+  @usage
+  <app-kpi-cards [items]="kpis"></app-kpi-cards>
+-->
+
+<!-- Landmark accesible para el grupo de KPIs -->
+<p-card>
+  <section class="kpi-grid" aria-labelledby="kpiSectionTitle">
+    <!-- Encabezado oculto, útil para usuarios de lector de pantalla -->
+    <h3 id="kpiSectionTitle" class="sr-only">
+      Indicadores clave de la compañía
+    </h3>
+
+    <!-- =========================================================================
+       VACACIONES
+       Muestra personas de vacaciones y horas consumidas, con barras de progreso.
+       ========================================================================= -->
+    <article
+      class="tile tile--vac surface-card border-1 surface-border border-round-xl"
+      *ngIf="getBy('vacaciones') as v"
+      [attr.aria-labelledby]="id('vacaciones', 'title')"
+      tabindex="0"
+    >
+      <header class="header">
+        <div class="left">
+          <i *ngIf="v.icon" [class]="v.icon" aria-hidden="true"></i>
+          <h4 class="label" [id]="id('vacaciones', 'title')">{{ v.label }}</h4>
+        </div>
+        <!-- Tag de tendencia accesible -->
+        <p-tag
+          *ngIf="v.trend"
+          [value]="trendText(v.trend)"
+          [severity]="trendSeverity(v.trend)"
+          styleClass="pill"
+          [attr.aria-label]="'Tendencia: ' + trendText(v.trend)"
+        />
+      </header>
+
+      <!-- Métrica principal -->
+      <div class="metric">
+        <div
+          class="metric-label"
+          *ngIf="v.main.label"
+          [id]="id('vacaciones', 'main-label')"
+        >
+          {{ v.main.label }}
+        </div>
+        <div
+          class="metric-value"
+          [attr.aria-describedby]="id('vacaciones', 'main-label')"
+        >
+          {{ v.main.value
+          }}<span *ngIf="v.main.unit" class="unit">{{ v.main.unit }}</span>
+        </div>
+
+        <!-- Progreso accesible con texto oculto -->
+        <span class="sr-only" *ngIf="v.main.target">
+          {{ v.label }} – {{ v.main.label || "Progreso" }}:
+          {{ progress(v.main) }} por ciento completado
+        </span>
+        <p-progressBar
+          *ngIf="v.main.target"
+          class="bar"
+          [value]="progress(v.main)"
+          [showValue]="false"
+          role="progressbar"
+          [attr.aria-valuemin]="0"
+          [attr.aria-valuemax]="100"
+          [attr.aria-valuenow]="progress(v.main)"
+          [attr.aria-label]="(v.main.label || v.label) + ' progreso'"
+        ></p-progressBar>
+      </div>
+
+      <!-- Métrica secundaria -->
+      <div class="metric secondary" *ngIf="v.secondary as s">
+        <div
+          class="metric-label"
+          *ngIf="s.label"
+          [id]="id('vacaciones', 'sec-label')"
+        >
+          {{ s.label }}
+        </div>
+        <div
+          class="metric-value"
+          [attr.aria-describedby]="id('vacaciones', 'sec-label')"
+        >
+          {{ s.value }}<span *ngIf="s.unit" class="unit">{{ s.unit }}</span>
+        </div>
+        <span class="sr-only" *ngIf="s.target">
+          {{ v.label }} – {{ s.label || "Progreso" }}: {{ progress(s) }} por
+          ciento completado
+        </span>
+        <p-progressBar
+          *ngIf="s.target"
+          class="bar"
+          [value]="progress(s)"
+          [showValue]="false"
+          role="progressbar"
+          [attr.aria-valuemin]="0"
+          [attr.aria-valuemax]="100"
+          [attr.aria-valuenow]="progress(s)"
+          [attr.aria-label]="(s.label || v.label) + ' progreso'"
+        ></p-progressBar>
+      </div>
+    </article>
+
+    <!-- =========================================================================
+       HORAS GASTADAS
+       Muestra horas invertidas hoy / en la semana, con barras de progreso.
+       ========================================================================= -->
+    <article
+      class="tile tile--horas surface-card border-1 surface-border border-round-xl"
+      *ngIf="getBy('horas') as h"
+      [attr.aria-labelledby]="id('horas', 'title')"
+      tabindex="0"
+    >
+      <header class="header">
+        <div class="left">
+          <i *ngIf="h.icon" [class]="h.icon" aria-hidden="true"></i>
+          <h4 class="label" [id]="id('horas', 'title')">{{ h.label }}</h4>
+        </div>
+        <p-tag
+          *ngIf="h.trend"
+          [value]="trendText(h.trend)"
+          [severity]="trendSeverity(h.trend)"
+          styleClass="pill"
+          [attr.aria-label]="'Tendencia: ' + trendText(h.trend)"
+        />
+      </header>
+
+      <!-- Métrica principal -->
+      <div class="metric">
+        <div
+          class="metric-label"
+          *ngIf="h.main.label"
+          [id]="id('horas', 'main-label')"
+        >
+          {{ h.main.label }}
+        </div>
+        <div
+          class="metric-value"
+          [attr.aria-describedby]="id('horas', 'main-label')"
+        >
+          {{ h.main.value
+          }}<span *ngIf="h.main.unit" class="unit">{{ h.main.unit }}</span>
+        </div>
+        <span class="sr-only" *ngIf="h.main.target">
+          {{ h.label }} – {{ h.main.label || "Progreso" }}:
+          {{ progress(h.main) }} por ciento completado
+        </span>
+        <p-progressBar
+          *ngIf="h.main.target"
+          class="bar"
+          [value]="progress(h.main)"
+          [showValue]="false"
+          role="progressbar"
+          [attr.aria-valuemin]="0"
+          [attr.aria-valuemax]="100"
+          [attr.aria-valuenow]="progress(h.main)"
+          [attr.aria-label]="(h.main.label || h.label) + ' progreso'"
+        ></p-progressBar>
+      </div>
+
+      <!-- Métrica secundaria -->
+      <div class="metric secondary" *ngIf="h.secondary as s">
+        <div
+          class="metric-label"
+          *ngIf="s.label"
+          [id]="id('horas', 'sec-label')"
+        >
+          {{ s.label }}
+        </div>
+        <div
+          class="metric-value"
+          [attr.aria-describedby]="id('horas', 'sec-label')"
+        >
+          {{ s.value }}<span *ngIf="s.unit" class="unit">{{ s.unit }}</span>
+        </div>
+        <span class="sr-only" *ngIf="s.target">
+          {{ h.label }} – {{ s.label || "Progreso" }}: {{ progress(s) }} por
+          ciento completado
+        </span>
+        <p-progressBar
+          *ngIf="s.target"
+          class="bar"
+          [value]="progress(s)"
+          [showValue]="false"
+          role="progressbar"
+          [attr.aria-valuemin]="0"
+          [attr.aria-valuemax]="100"
+          [attr.aria-valuenow]="progress(s)"
+          [attr.aria-label]="(s.label || h.label) + ' progreso'"
+        ></p-progressBar>
+      </div>
+    </article>
+
+    <!-- =========================================================================
+       TAREAS DEL DÍA
+       Muestra nº de tareas completadas frente al total esperado.
+       ========================================================================= -->
+    <article
+      class="tile tile--tareas surface-card border-1 surface-border border-round-xl"
+      *ngIf="getBy('tareas') as t"
+      [attr.aria-labelledby]="id('tareas', 'title')"
+      tabindex="0"
+    >
+      <header class="header">
+        <div class="left">
+          <i *ngIf="t.icon" [class]="t.icon" aria-hidden="true"></i>
+          <h4 class="label" [id]="id('tareas', 'title')">{{ t.label }}</h4>
+        </div>
+        <p-tag
+          *ngIf="t.trend"
+          [value]="trendText(t.trend)"
+          [severity]="trendSeverity(t.trend)"
+          styleClass="pill"
+          [attr.aria-label]="'Tendencia: ' + trendText(t.trend)"
+        />
+      </header>
+
+      <div class="metric">
+        <div class="metric-value">{{ t.main.value }}</div>
+        <div class="metric-meta" *ngIf="t.main.target as tg">de {{ tg }}</div>
+        <p-progressBar
+          *ngIf="t.main.target"
+          class="bar"
+          [value]="progress(t.main)"
+          [showValue]="false"
+          role="progressbar"
+          [attr.aria-valuemin]="0"
+          [attr.aria-valuemax]="100"
+          [attr.aria-valuenow]="progress(t.main)"
+          aria-label="Progreso tareas del día"
+        ></p-progressBar>
+        <span class="sr-only" *ngIf="t.main.target"
+          >Tareas del día: {{ progress(t.main) }} por ciento completado</span
+        >
+      </div>
+    </article>
+
+    <!-- =========================================================================
+       PETICIONES
+       Número de peticiones pendientes en el sistema.
+       ========================================================================= -->
+    <article
+      class="tile tile--peti surface-card border-1 surface-border border-round-xl"
+      *ngIf="getBy('peticiones') as p"
+      [attr.aria-labelledby]="id('peticiones', 'title')"
+      tabindex="0"
+    >
+      <header class="header">
+        <div class="left">
+          <i *ngIf="p.icon" [class]="p.icon" aria-hidden="true"></i>
+          <h4 class="label" [id]="id('peticiones', 'title')">{{ p.label }}</h4>
+        </div>
+        <p-tag
+          *ngIf="p.trend"
+          [value]="trendText(p.trend)"
+          [severity]="trendSeverity(p.trend)"
+          styleClass="pill"
+          [attr.aria-label]="'Tendencia: ' + trendText(p.trend)"
+        />
+      </header>
+      <div class="metric">
+        <div class="metric-value">{{ p.main.value }}</div>
+        <span class="sr-only">Peticiones pendientes: {{ p.main.value }}</span>
+      </div>
+    </article>
+
+    <!-- =========================================================================
+       INCIDENCIAS
+       Número de incidencias abiertas actualmente.
+       ========================================================================= -->
+    <article
+      class="tile tile--inci surface-card border-1 surface-border border-round-xl"
+      *ngIf="getBy('incidencias') as i"
+      [attr.aria-labelledby]="id('incidencias', 'title')"
+      tabindex="0"
+    >
+      <header class="header">
+        <div class="left">
+          <i *ngIf="i.icon" [class]="i.icon" aria-hidden="true"></i>
+          <h4 class="label" [id]="id('incidencias', 'title')">{{ i.label }}</h4>
+        </div>
+        <p-tag
+          *ngIf="i.trend"
+          [value]="trendText(i.trend)"
+          [severity]="trendSeverity(i.trend)"
+          styleClass="pill"
+          [attr.aria-label]="'Tendencia: ' + trendText(i.trend)"
+        />
+      </header>
+      <div class="metric">
+        <div class="metric-value">{{ i.main.value }}</div>
+        <span class="sr-only">Incidencias abiertas: {{ i.main.value }}</span>
+      </div>
+    </article>
+  </section>
+</p-card>

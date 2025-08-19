@@ -1,0 +1,92 @@
+/// ============================================================================
+/// @fileoverview schedule-overview.component.scss
+/// @description
+/// Estilos para la tabla de "Horario de hoy" con énfasis en accesibilidad:
+/// - Fila actual resaltada con fondo suave.
+/// - Enfoque visible al navegar con teclado.
+/// - Columnas de hora con números tabulares.
+/// - Columna de estado compacta.
+/// ============================================================================
+
+/* Solo visible para lectores de pantalla */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* Cabecera de la tarjeta */
+.header {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  margin-bottom: 0.5rem;
+}
+
+.title {
+  margin: 0;
+  font-size: 1.05rem;
+  font-weight: 700;
+}
+
+.date {
+  color: #6b7280;
+  font-size: 0.9rem;
+}
+
+/* Sticky header de la tabla */
+.schedule-table :host ::ng-deep thead tr {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  background: #fff;
+}
+
+/* Padding estándar */
+.schedule-table :host ::ng-deep th,
+.schedule-table :host ::ng-deep td {
+  padding: 0.65rem 0.75rem;
+}
+
+/* Formatos */
+.time {
+  font-variant-numeric: tabular-nums;
+  font-weight: 600;
+}
+
+.employee {
+  font-weight: 600;
+}
+
+.role {
+  color: #6b7280;
+}
+
+.state-col {
+  width: 1%;
+  white-space: nowrap;
+}
+
+/* Fila activa (empleado en turno) */
+tr.current {
+  background-color: #f9fafb;
+  transition: background-color 0.3s ease;
+
+  .time {
+    font-weight: 700;
+    color: var(--primary-color, #3b82f6);
+  }
+}
+
+/* Foco accesible en filas */
+:host ::ng-deep tbody tr:focus-visible {
+  outline: 2px solid var(--primary-color, #3b82f6);
+  outline-offset: -2px;
+  border-radius: 4px;
+}

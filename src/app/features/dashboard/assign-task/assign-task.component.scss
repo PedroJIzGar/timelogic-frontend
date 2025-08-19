@@ -1,0 +1,39 @@
+/* 
+  Estilos accesibles y limpios para el formulario de asignación de tareas.
+  - Usa grid para alinear campos.
+  - Mensajes de error visibles con color accesible.
+  - Botón fijo abajo del formulario.
+*/
+
+:host {
+  display: block;
+  width: 100%;
+}
+
+form {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+
+  label {
+    font-weight: 600;
+    color: var(--text-color);
+  }
+
+  .p-error {
+    font-size: 0.75rem;
+    color: #e24c4c; // rojo accesible para error
+  }
+}
+
+.form-actions {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 1rem;
+}

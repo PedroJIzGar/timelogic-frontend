@@ -1,0 +1,79 @@
+<p-card header="Asignar tarea" styleClass="card h-100">
+  <form [formGroup]="form" (ngSubmit)="submit()" novalidate>
+    
+    <!-- Selección de empleado -->
+    <div class="field">
+      <label for="employee">Empleado</label>
+      <p-dropdown
+        id="employee"
+        formControlName="employee"
+        [options]="employees"
+        optionLabel="name"
+        placeholder="Selecciona un empleado"
+        aria-label="Selecciona un empleado"
+      ></p-dropdown>
+      <small class="p-error" *ngIf="form.get('employee')?.invalid && form.get('employee')?.touched">
+        El empleado es obligatorio.
+      </small>
+    </div>
+
+    <!-- Título -->
+    <div class="field">
+      <label for="title">Título</label>
+      <input
+        pInputText
+        id="title"
+        type="text"
+        formControlName="title"
+        placeholder="Ej: Preparar informe"
+        aria-label="Título de la tarea"
+      />
+      <small class="p-error" *ngIf="form.get('title')?.invalid && form.get('title')?.touched">
+        El título es obligatorio (mín. 3 caracteres).
+      </small>
+    </div>
+
+    <!-- Descripción -->
+    <div class="field">
+      <label for="description">Descripción</label>
+      <textarea
+        pInputTextarea
+        id="description"
+        formControlName="description"
+        rows="3"
+        placeholder="Detalles de la tarea"
+        aria-label="Descripción de la tarea"
+      ></textarea>
+      <small class="p-error" *ngIf="form.get('description')?.invalid && form.get('description')?.touched">
+        La descripción es obligatoria.
+      </small>
+    </div>
+
+    <!-- Fecha límite -->
+    <div class="field">
+      <label for="deadline">Fecha límite</label>
+      <p-calendar
+        id="deadline"
+        formControlName="deadline"
+        dateFormat="dd/mm/yy"
+        placeholder="Selecciona una fecha"
+        aria-label="Fecha límite"
+      ></p-calendar>
+      <small class="p-error" *ngIf="form.get('deadline')?.invalid && form.get('deadline')?.touched">
+        La fecha límite es obligatoria.
+      </small>
+    </div>
+
+    <!-- Botón de enviar -->
+    <div class="form-actions">
+      <button
+        pButton
+        type="submit"
+        label="Asignar tarea"
+        icon="pi pi-check"
+        [disabled]="form.invalid"
+        aria-label="Asignar tarea"
+      ></button>
+    </div>
+  </form>
+</p-card>

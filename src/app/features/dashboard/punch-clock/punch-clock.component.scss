@@ -1,0 +1,161 @@
+/* ==========================================================================
+   PunchClock – Estilos
+   ----------------------------------------------------------------------------
+   - Contador centrado, tipografía tabular.
+   - Botón principal compacto y centrado.
+   - Botón de pausa discreto.
+   - Accesibilidad: foco visible, regiones live.
+   ========================================================================== */
+
+:host {
+  display: block;
+  height: 100%; /* el host se estira dentro de la columna */
+}
+
+/* ✅ El p-card ocupa todo el alto disponible */
+:host ::ng-deep .p-card.card.h-100 {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ✅ El body del card también se estira y permite centrar su contenido */
+:host ::ng-deep .p-card .p-card-body {
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+}
+
+/* La sección del punch clock ocupa el espacio y centra su interior */
+.pc {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center; /* ✅ centrado vertical dentro del card */
+  text-align: center;
+  gap: 0.5rem;
+  flex: 1 1 auto; /* ✅ ocupa el alto del body del card */
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* Chip de estado fino */
+.state-chip :host ::ng-deep .p-tag {
+  border-radius: 999px;
+  padding: 0.15rem 0.5rem;
+  font-size: 0.8rem;
+}
+
+/* Contador grande centrado */
+.counter {
+  font-variant-numeric: tabular-nums;
+  font-weight: 800;
+  letter-spacing: 0.5px;
+  line-height: 1;
+  font-size: clamp(2rem, 4vw, 2.8rem);
+  margin-top: 0.25rem;
+  color: var(--text-color, #111827);
+}
+
+/* Botón principal compacto */
+.main-btn {
+  margin-top: 0.35rem;
+  border-radius: 9999px;
+  padding: 0.55rem 1.25rem; /* más pequeño que antes */
+  font-weight: 700;
+}
+
+/* Texto de ayuda bajo el botón */
+.help {
+  color: var(--text-color-secondary, #6b7280);
+  font-size: 0.85rem;
+}
+
+/* Botón de pausa */
+.pause-btn {
+  margin-top: 0.15rem;
+  border-radius: 9999px;
+  padding: 0.45rem 1rem;
+}
+
+/* Diálogo de pausa */
+.dialog-body {
+  display: flex;
+  flex-direction: column;
+  gap: 0.9rem;
+
+  textarea {
+    width: 100%;
+    resize: none;
+  }
+}
+
+.dialog-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.5rem;
+}
+
+/* Foco accesible general en botones */
+button:focus-visible {
+  outline: 2px solid var(--primary-color, #3b82f6);
+  outline-offset: 2px;
+  border-radius: 9999px;
+}
+
+/* Historial compacto, con scroll si crece */
+.history {
+  width: 100%;
+  max-width: 420px;
+  margin-top: 0.75rem;
+  text-align: left;
+
+  .history-title {
+    margin: 0 0 0.35rem;
+    font-size: 0.95rem;
+    font-weight: 700;
+  }
+
+  .history-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    max-height: 140px; /* mantiene el punch-clock compacto */
+    overflow-y: auto; /* scroll interno del historial */
+  }
+
+  .history-item {
+    display: flex;
+    gap: 0.5rem;
+    padding: 0.25rem 0;
+    font-size: 0.9rem;
+    line-height: 1.4;
+
+    .when {
+      font-variant-numeric: tabular-nums;
+      color: var(--text-color-secondary);
+    }
+    .type {
+      font-weight: 600;
+    }
+    .note {
+      color: var(--text-color-secondary);
+      font-style: italic;
+    }
+  }
+
+  .empty {
+    color: var(--text-color-secondary);
+    font-size: 0.9rem;
+  }
+}
