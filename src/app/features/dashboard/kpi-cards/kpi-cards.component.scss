@@ -51,20 +51,12 @@
     "peti"
     "inci";
 
-  @media (min-width: 768px) {
+  @media (min-width: 1200px) {
     grid-template-columns: 1fr 1fr;
     grid-template-areas:
       "vac   horas"
-      "tareas peti"
-      "tareas inci";
-  }
-
-  @media (min-width: 1200px) {
-    grid-template-columns: 1fr 1fr 1fr;
-    grid-template-areas:
-      "vac   horas tareas"
-      "vac   horas peti"
-      "vac   horas inci";
+      "peti tareas"
+      "inci tareas";
   }
 }
 
@@ -89,6 +81,8 @@
 .tile {
   padding: 0.9rem 1rem;
   transition: transform 0.15s ease, box-shadow 0.15s ease;
+  border: none; /* quita la línea */
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05); /* opcional: dar efecto "card" */
 
   /// Foco accesible para navegación con teclado
   &:focus-visible {

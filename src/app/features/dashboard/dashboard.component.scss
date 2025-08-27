@@ -1,39 +1,56 @@
-.dashboard {
-  .col-12.md\:col-4 {
-    display: flex;
-    /* ✅ Estira el hijo a la altura de la fila */
-    align-items: stretch;
-    /* ❌ Nada de centrar vertical aquí */
-    justify-content: flex-start;
-    flex-direction: column;
-    height: 100%;
-    padding: 1rem;
-    box-sizing: border-box;
-
-    /* El hijo ocupa todo el ancho */
-    > * {
-      width: 100%;
-    }
-  }
+/* ====== GUTTER (espacio entre columnas/filas) solo aquí ====== */
+.dashboard.grid > [class^="col-"],
+.dashboard.grid > [class*=" col-"] {
+  padding: 0.25rem; /* ajusta a tu gusto (.25/.125/.5) */
 }
 
+/* ====== Igualar alturas entre columnas (todas las filas) ====== */
 .dashboard.grid {
-  /* ✅ Asegura que todas las columnas de la fila tengan la misma altura */
+  align-items: stretch;
+
+  /* ====== Altura mínima igualada para la fila Horario + Task ====== */
+  --rows-max: 10; /* filas por página en p-table */
+  --row-h: 44px; /* alto medio de fila */
+  --thead-h: 48px; /* alto cabecera */
+  --paginator-h: 56px; /* alto paginador */
+  --card-pad-v: 24px; /* padding vertical total del p-card */
+  --eq-min-h: calc(
+    var(--thead-h) + var(--rows-max) * var(--row-h) + var(--paginator-h) +
+      var(--card-pad-v)
+  );
+}
+
+/* ====== PRIMERA FILA (punch + kpis) ====== */
+.dashboard.grid > .col-12.md\:col-4,
+.dashboard.grid > .col-12.md\:col-8 {
+  display: flex;
   align-items: stretch;
 }
-
-.card {
-  border-radius: 1rem;
+.dashboard.grid > .col-12.md\:col-4 > *,
+.dashboard.grid > .col-12.md\:col-8 > * {
+  flex: 1 1 auto;
+  min-width: 0;
 }
 
-.placeholder {
+/* ====== SEGUNDA FILA (horario + assign task) ====== */
+.dashboard.grid > .col-12.md\:col-6 {
   display: flex;
-  align-items: center;
-  min-height: 48px;
-  font-size: 0.95rem;
+  align-items: stretch;
+}
+.dashboard.grid > .col-12.md\:col-6 > * {
+  flex: 1 1 auto;
+  min-width: 0;
 }
 
+/* Cualquier p-card marcado con esta clase tendrá la altura mínima igualada */
+.dashboard.grid .equal-card {
+  min-height: var(--eq-min-h);
+}
+
+/* utilidades */
 .h-100 {
   height: 100%;
 }
-
+.card {
+  border-radius: 1rem;
+}

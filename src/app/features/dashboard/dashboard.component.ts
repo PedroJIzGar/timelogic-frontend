@@ -72,13 +72,85 @@ export class DashboardComponent {
       trend: 'down',
     },
   ];
+  
+schedule: ScheduleEntry[] = [
+  // ============ MARTES 26/08/2025 — 20 empleados (DÍA COMPLETO) ============
+  { date: '2025-08-26', start: '08:00', end: '13:00', employee: 'Laura Izquierdo',  role: 'Recepción' },
+  { date: '2025-08-26', start: '09:00', end: '13:00', employee: 'Carlos Saez',     role: 'Ventas' },
+  { date: '2025-08-26', start: '10:00', end: '14:00', employee: 'Nora Fernandez',  role: 'Soporte' },
+  { date: '2025-08-26', start: '13:00', end: '17:00', employee: 'Iván López',      role: 'Almacén' },
+  { date: '2025-08-26', start: '16:00', end: '18:30', employee: 'Ana Ruiz',        role: 'RRHH' },
+  { date: '2025-08-26', start: '18:00', end: '20:00', employee: 'Diego Martín',    role: 'IT' },
+  { date: '2025-08-26', start: '08:30', end: '12:30', employee: 'Sofía Gómez',     role: 'Marketing' },
+  { date: '2025-08-26', start: '12:00', end: '16:00', employee: 'Pedro Álvarez',   role: 'Compras' },
+  { date: '2025-08-26', start: '09:00', end: '15:00', employee: 'María Torres',    role: 'Finanzas' },
+  { date: '2025-08-26', start: '10:00', end: '13:30', employee: 'Javier Romero',   role: 'Logística' },
+  { date: '2025-08-26', start: '11:00', end: '14:00', employee: 'Lucía Navarro',   role: 'Calidad' },
+  { date: '2025-08-26', start: '13:00', end: '18:00', employee: 'Andrés Pérez',    role: 'Atención' },
+  { date: '2025-08-26', start: '08:00', end: '12:00', employee: 'Elena Morales',   role: 'Producción' },
+  { date: '2025-08-26', start: '12:00', end: '19:00', employee: 'Hugo Castillo',   role: 'Diseño' },
+  { date: '2025-08-26', start: '07:30', end: '11:30', employee: 'Marta Sánchez',   role: 'Jurídico' },
+  { date: '2025-08-26', start: '14:00', end: '19:00', employee: 'Raúl Ortega',     role: 'Operaciones' },
+  { date: '2025-08-26', start: '09:30', end: '13:00', employee: 'Paula Vidal',     role: 'Seguridad' },
+  { date: '2025-08-26', start: '15:00', end: '20:00', employee: 'Sergio Cabrera',  role: 'Mantenimiento' },
+  { date: '2025-08-26', start: '08:00', end: '16:00', employee: 'Claudia Núñez',   role: 'Comercial' },
+  { date: '2025-08-26', start: '10:30', end: '18:30', employee: 'Tomás Herrera',   role: 'Dirección' },
+  // Turno partido para probar "+n" en Semana
+  { date: '2025-08-26', start: '15:30', end: '16:30', employee: 'Iván López',      role: 'Almacén' },
+  { date: '2025-08-26', start: '19:00', end: '20:00', employee: 'María Torres',    role: 'Finanzas' },
 
-  schedule: ScheduleEntry[] = [
-    { start: '08:00', end: '13:00', employee: 'Laura', role: 'Recepción' },
-    { start: '09:00', end: '13:00', employee: 'Carlos', role: 'Ventas' },
-    { start: '10:00', end: '11:00', employee: 'Nora', role: 'Soporte' },
-    { start: '13:00', end: '14:00', employee: 'Iván', role: 'Almacén' },
-  ];
+  // ============ LUNES 25/08/2025 — 10 empleados ============
+  { date: '2025-08-25', start: '08:00', end: '13:00', employee: 'Laura Izquierdo',  role: 'Recepción' },
+  { date: '2025-08-25', start: '09:00', end: '13:00', employee: 'Carlos Saez',     role: 'Ventas' },
+  { date: '2025-08-25', start: '10:00', end: '14:00', employee: 'Nora Fernandez',  role: 'Soporte' },
+  { date: '2025-08-25', start: '13:00', end: '17:00', employee: 'Iván López',      role: 'Almacén' },
+  { date: '2025-08-25', start: '16:00', end: '18:00', employee: 'Ana Ruiz',        role: 'RRHH' },
+  { date: '2025-08-25', start: '18:00', end: '20:00', employee: 'Diego Martín',    role: 'IT' },
+  { date: '2025-08-25', start: '08:30', end: '12:30', employee: 'Sofía Gómez',     role: 'Marketing' },
+  { date: '2025-08-25', start: '12:00', end: '16:00', employee: 'Pedro Álvarez',   role: 'Compras' },
+  { date: '2025-08-25', start: '09:00', end: '15:00', employee: 'María Torres',    role: 'Finanzas' },
+  { date: '2025-08-25', start: '10:00', end: '13:30', employee: 'Javier Romero',   role: 'Logística' },
+
+  // ============ MIÉRCOLES 27/08/2025 — 12 empleados ============
+  { date: '2025-08-27', start: '08:00', end: '12:00', employee: 'Laura Izquierdo',  role: 'Recepción' },
+  { date: '2025-08-27', start: '09:00', end: '14:00', employee: 'Carlos Saez',     role: 'Ventas' },
+  { date: '2025-08-27', start: '12:00', end: '14:00', employee: 'Nora Fernandez',  role: 'Soporte' },
+  { date: '2025-08-27', start: '13:00', end: '15:00', employee: 'Iván López',      role: 'Almacén' },
+  { date: '2025-08-27', start: '15:00', end: '18:00', employee: 'Ana Ruiz',        role: 'RRHH' },
+  { date: '2025-08-27', start: '18:00', end: '20:00', employee: 'Diego Martín',    role: 'IT' },
+  { date: '2025-08-27', start: '09:30', end: '13:30', employee: 'Lucía Navarro',   role: 'Calidad' },
+  { date: '2025-08-27', start: '13:00', end: '18:00', employee: 'Andrés Pérez',    role: 'Atención' },
+  { date: '2025-08-27', start: '08:00', end: '12:00', employee: 'Elena Morales',   role: 'Producción' },
+  { date: '2025-08-27', start: '12:00', end: '19:00', employee: 'Hugo Castillo',   role: 'Diseño' },
+  { date: '2025-08-27', start: '07:30', end: '11:30', employee: 'Marta Sánchez',   role: 'Jurídico' },
+  { date: '2025-08-27', start: '14:00', end: '19:00', employee: 'Raúl Ortega',     role: 'Operaciones' },
+
+  // ============ JUEVES 28/08/2025 — 8 empleados ============
+  { date: '2025-08-28', start: '08:00', end: '13:00', employee: 'Claudia Núñez',   role: 'Comercial' },
+  { date: '2025-08-28', start: '10:30', end: '18:30', employee: 'Tomás Herrera',   role: 'Dirección' },
+  { date: '2025-08-28', start: '09:30', end: '13:00', employee: 'Paula Vidal',     role: 'Seguridad' },
+  { date: '2025-08-28', start: '15:00', end: '20:00', employee: 'Sergio Cabrera',  role: 'Mantenimiento' },
+  { date: '2025-08-28', start: '08:30', end: '12:30', employee: 'Sofía Gómez',     role: 'Marketing' },
+  { date: '2025-08-28', start: '12:00', end: '16:00', employee: 'Pedro Álvarez',   role: 'Compras' },
+  { date: '2025-08-28', start: '10:00', end: '13:30', employee: 'Javier Romero',   role: 'Logística' },
+  { date: '2025-08-28', start: '11:00', end: '14:00', employee: 'Lucía Navarro',   role: 'Calidad' },
+
+  // ============ VIERNES 29/08/2025 — 14 empleados ============
+  { date: '2025-08-29', start: '08:00', end: '13:00', employee: 'Laura Izquierdo',  role: 'Recepción' },
+  { date: '2025-08-29', start: '09:00', end: '12:00', employee: 'Carlos Saez',     role: 'Ventas' },
+  { date: '2025-08-29', start: '12:00', end: '14:00', employee: 'Nora Fernandez',  role: 'Soporte' },
+  { date: '2025-08-29', start: '13:00', end: '14:00', employee: 'Iván López',      role: 'Almacén' },
+  { date: '2025-08-29', start: '16:00', end: '20:00', employee: 'Diego Martín',    role: 'IT' },
+  { date: '2025-08-29', start: '08:00', end: '09:00', employee: 'Ana Ruiz',        role: 'RRHH' },
+  { date: '2025-08-29', start: '09:30', end: '13:00', employee: 'Paula Vidal',     role: 'Seguridad' },
+  { date: '2025-08-29', start: '15:00', end: '20:00', employee: 'Sergio Cabrera',  role: 'Mantenimiento' },
+  { date: '2025-08-29', start: '08:00', end: '16:00', employee: 'Claudia Núñez',   role: 'Comercial' },
+  { date: '2025-08-29', start: '10:30', end: '18:30', employee: 'Tomás Herrera',   role: 'Dirección' },
+  { date: '2025-08-29', start: '12:00', end: '19:00', employee: 'Hugo Castillo',   role: 'Diseño' },
+  { date: '2025-08-29', start: '07:30', end: '11:30', employee: 'Marta Sánchez',   role: 'Jurídico' },
+  { date: '2025-08-29', start: '13:00', end: '18:00', employee: 'Andrés Pérez',    role: 'Atención' },
+  { date: '2025-08-29', start: '09:00', end: '15:00', employee: 'María Torres',    role: 'Finanzas' },
+];
 
   requests: PendingRequest[] = [
     {

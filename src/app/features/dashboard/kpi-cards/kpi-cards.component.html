@@ -39,7 +39,7 @@
        Muestra personas de vacaciones y horas consumidas, con barras de progreso.
        ========================================================================= -->
     <article
-      class="tile tile--vac surface-card border-1 surface-border border-round-xl"
+      class="tile tile--vac"
       *ngIf="getBy('vacaciones') as v"
       [attr.aria-labelledby]="id('vacaciones', 'title')"
       tabindex="0"
@@ -132,7 +132,7 @@
        Muestra horas invertidas hoy / en la semana, con barras de progreso.
        ========================================================================= -->
     <article
-      class="tile tile--horas surface-card border-1 surface-border border-round-xl"
+      class="tile tile--horas"
       *ngIf="getBy('horas') as h"
       [attr.aria-labelledby]="id('horas', 'title')"
       tabindex="0"
@@ -222,7 +222,7 @@
        Muestra nº de tareas completadas frente al total esperado.
        ========================================================================= -->
     <article
-      class="tile tile--tareas surface-card border-1 surface-border border-round-xl"
+      class="tile tile--tareas"
       *ngIf="getBy('tareas') as t"
       [attr.aria-labelledby]="id('tareas', 'title')"
       tabindex="0"
@@ -266,7 +266,7 @@
        Número de peticiones pendientes en el sistema.
        ========================================================================= -->
     <article
-      class="tile tile--peti surface-card border-1 surface-border border-round-xl"
+      class="tile tile--peti"
       *ngIf="getBy('peticiones') as p"
       [attr.aria-labelledby]="id('peticiones', 'title')"
       tabindex="0"
@@ -295,7 +295,7 @@
        Número de incidencias abiertas actualmente.
        ========================================================================= -->
     <article
-      class="tile tile--inci surface-card border-1 surface-border border-round-xl"
+      class="tile tile--inci"
       *ngIf="getBy('incidencias') as i"
       [attr.aria-labelledby]="id('incidencias', 'title')"
       tabindex="0"
