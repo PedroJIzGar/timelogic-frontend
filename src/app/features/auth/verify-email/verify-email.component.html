@@ -1,0 +1,23 @@
+<p-toast></p-toast>
+
+<div class="auth-shell">
+    <p-card styleClass="auth-card auth-card-scroll">
+        <ng-template pTemplate="header">
+            <div class="auth-header">
+                <div class="brand" aria-hidden="true">
+                    <i class="pi pi-envelope" style="font-size:3rem"></i>
+                </div>
+                <h1 class="title">Verifica tu correo</h1>
+                <p class="subtitle">Hemos enviado un enlace de verificación a tu email.</p>
+            </div>
+        </ng-template>
+
+        <div class="auth-form">
+            <button pButton class="auth-submit" (click)="resend()" [loading]="loading()"
+                label="Reenviar correo"></button>
+            <div class="auth-footer" style="margin-top:.5rem">
+                <a (click)="goLogin()">Volver a iniciar sesión</a>
+            </div>
+        </div>
+    </p-card>
+</div>

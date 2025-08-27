@@ -1,0 +1,152 @@
+<!--
+  PunchClock – UI con contador centrado, botón principal y pausa/reanudar.
+  Accesible (aria-live, descripciones) y con UX cuidada (form en el diálogo).
+-->
+<p-card styleClass="card h-100">
+  <section class="pc" aria-labelledby="pcTitle">
+    <h3 id="pcTitle" class="sr-only">Fichar entrada y salida</h3>
+
+    <!-- Región viva para mensajes (confirmaciones de entrada/salida/pausa) -->
+    <span class="sr-only" aria-live="polite">{{ live() }}</span>
+
+    <!-- ==== Chip de estado (Fuera de turno / En pausa / En turno) ==== -->
+    <p-tag
+      class="state-chip"
+      [value]="stateLabel()"
+      [severity]="stateSeverity()"
+      [attr.aria-label]="'Estado actual: ' + stateLabel()"
+    ></p-tag>
+
+    <!-- ==== Contador centrado ==== -->
+    <div class="counter" aria-live="polite" aria-atomic="true">
+      {{ counter() }}
+    </div>
+
+    <!-- ==== Botón principal (Entrada/Salida) ==== -->
+    <button
+      pButton
+      pRipple
+      class="main-btn"
+      type="button"
+      [label]="btnText()"
+      [icon]="btnIcon()"
+      [severity]="btnSeverity()"
+      (click)="toggleWork()"
+      [attr.aria-pressed]="isWorking()"
+      aria-describedby="pcHelp"
+    ></button>
+    <small id="pcHelp" class="help">
+      Pulsa para
+      {{ isWorking() ? "registrar tu salida" : "iniciar tu jornada" }}.
+    </small>
+
+    <!-- ==== Botón Pausa o Reanudar (según estado) ==== -->
+    <button
+      *ngIf="isWorking() && !isPaused()"
+      pButton
+      pRipple
+      class="pause-btn"
+      type="button"
+      label="Pausa"
+      icon="pi pi-pause"
+      severity="warning"
+      (click)="openPause()"
+      aria-label="Iniciar pausa"
+    ></button>
+
+    <button
+      *ngIf="isPaused()"
+      pButton
+      pRipple
+      class="resume-btn"
+      type="button"
+      label="Reanudar"
+      icon="pi pi-play"
+      severity="success"
+      (click)="resumeWork()"
+      aria-label="Reanudar jornada"
+    ></button>
+
+    <!-- ==== Diálogo: motivo de pausa ==== -->
+    <p-dialog
+      header="Motivo de la pausa"
+      [visible]="pauseDialogVisible()"
+      (onHide)="pauseDialogVisible.set(false)"
+      [modal]="true"
+      [closable]="false"
+      [dismissableMask]="true"
+      [style]="{ width: '420px' }"
+      appendTo="body"
+      aria-modal="true"
+    >
+      <!-- Form para poder confirmar con Enter -->
+      <form
+        class="dialog-body"
+        (ngSubmit)="confirmPause()"
+        #pauseForm="ngForm"
+        novalidate
+      >
+        <label for="pauseReason" class="sr-only">Motivo de la pausa</label>
+        <textarea
+          id="pauseReason"
+          pInputTextarea
+          rows="3"
+          placeholder="Escribe el motivo…"
+          [(ngModel)]="pauseText"
+          name="pauseText"
+          required
+          minlength="2"
+          aria-describedby="pauseHint"
+        ></textarea>
+        <small id="pauseHint" class="help"
+          >Ej.: descanso, reunión, logística…</small
+        >
+        <div class="char-count" aria-hidden="true">
+          {{ pauseText.length || 0 }} / 200
+        </div>
+
+        <div class="dialog-actions">
+          <button
+            pButton
+            type="button"
+            label="Cancelar"
+            severity="secondary"
+            (click)="pauseDialogVisible.set(false)"
+          ></button>
+          <button
+            pButton
+            type="submit"
+            label="Confirmar"
+            severity="warning"
+            [disabled]="!pauseText.trim()"
+          ></button>
+        </div>
+      </form>
+    </p-dialog>
+
+    <!-- ==== Historial (compacto, con scroll interno) ==== -->
+    <div class="history" aria-live="polite" aria-label="Historial de fichajes">
+      <h4 class="history-title">Historial</h4>
+
+      <ul
+        class="history-list"
+        role="list"
+        *ngIf="eventsView().length; else empty"
+      >
+        <li
+          class="history-item"
+          role="listitem"
+          *ngFor="let e of eventsView(); trackBy: trackByEvent"
+        >
+          <span class="when">{{ e.at | date : "HH:mm" }}</span>
+          <span class="type">{{ e.type }}</span>
+          <span class="note" *ngIf="e.note">— {{ e.note }}</span>
+        </li>
+      </ul>
+
+      <ng-template #empty>
+        <p class="empty">Sin registros aún.</p>
+      </ng-template>
+    </div>
+  </section>
+</p-card>

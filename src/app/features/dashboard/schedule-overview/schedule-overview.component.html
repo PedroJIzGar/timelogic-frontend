@@ -1,0 +1,287 @@
+<!-- ============================================================================
+  ScheduleOverview — HTML (Día / Semana)
+  - Añadido toggle global Semana/Día en el header (fuera del popover).
+  - Mantiene el popover con su propio toggle interno e independencia de modelo.
+============================================================================ -->
+<section
+  class="schedule-overview"
+  role="region"
+  aria-labelledby="scheduleTitle"
+>
+  <p-card [styleClass]="'equal-card'">
+    <!-- ===== Header ===== -->
+    <div class="header">
+      <div class="left">
+        <i class="pi pi-calendar i-header" aria-hidden="true"></i>
+        <h2 class="title" id="scheduleTitle">Horario</h2>
+      </div>
+
+      <div class="controls">
+        <!-- Toggle global Semana/Día (afecta a la vista del horario) -->
+        <div
+          class="mode-toggle small"
+          role="radiogroup"
+          aria-label="Cambiar vista del horario"
+        >
+          <input
+            type="radio"
+            id="head-week"
+            name="headmode"
+            [checked]="viewMode() === 'week'"
+            (change)="setMode('week')"
+          />
+          <label for="head-week">Semana</label>
+
+          <input
+            type="radio"
+            id="head-day"
+            name="headmode"
+            [checked]="viewMode() === 'day'"
+            (change)="setMode('day')"
+          />
+          <label for="head-day">Día</label>
+
+          <span
+            class="pill"
+            [class.day]="viewMode() === 'day'"
+            aria-hidden="true"
+          ></span>
+        </div>
+
+        <!-- Chip con el rango activo (sirve también como botón) -->
+        <button
+          pButton
+          type="button"
+          class="date-badge p-button-outlined p-button-sm"
+          (click)="toggleFilter($event)"
+          [attr.aria-controls]="'filterPopover'"
+          [attr.aria-haspopup]="'dialog'"
+          [attr.aria-expanded]="filterOpen"
+        >
+          <i class="pi pi-calendar mr-2" aria-hidden="true"></i>
+          <span>{{ rangeLabel }}</span>
+        </button>
+
+        <!-- Popover anclado al botón -->
+        <p-overlayPanel
+          #filterPanel
+          id="filterPopover"
+          [dismissable]="true"
+          [showCloseIcon]="false"
+          [appendTo]="'body'"
+          (onShow)="filterOpen = true"
+          (onHide)="filterOpen = false"
+          styleClass="filter-popover"
+        >
+          <div class="pop-body">
+            <!-- Toggle Semana/Día · ON/OFF pill (sólo para el popover) -->
+            <div
+              class="mode-toggle"
+              role="radiogroup"
+              aria-label="Cambiar vista"
+            >
+              <input
+                type="radio"
+                id="opt-week"
+                name="mode"
+                [checked]="viewModeTmp === 'week'"
+                (change)="setView('week')"
+              />
+              <label for="opt-week">Semana</label>
+
+              <input
+                type="radio"
+                id="opt-day"
+                name="mode"
+                [checked]="viewModeTmp === 'day'"
+                (change)="setView('day')"
+              />
+              <label for="opt-day">Día</label>
+
+              <span
+                class="pill"
+                [class.day]="viewModeTmp === 'day'"
+                aria-hidden="true"
+              ></span>
+            </div>
+
+            <!-- Calendario compacto -->
+            <p-calendar
+              [(ngModel)]="rangeTmp"
+              [inline]="true"
+              [selectionMode]="viewModeTmp === 'week' ? 'range' : 'single'"
+              [showWeek]="true"
+              [touchUI]="false"
+              [monthNavigator]="true"
+              [yearNavigator]="true"
+              [yearRange]="'2000:2100'"
+              (onSelect)="onCalendarChange($event)"
+              styleClass="popover-calendar"
+            ></p-calendar>
+
+            <!-- Acciones -->
+            <div class="actions" style="margin-top: 0.5rem">
+              <button
+                pButton
+                type="button"
+                label="Cerrar"
+                class="p-button-text"
+                (click)="closeFilter()"
+              ></button>
+              <button
+                pButton
+                type="button"
+                label="Aplicar"
+                (click)="applyFilter()"
+                [disabled]="!rangeStart"
+              ></button>
+            </div>
+          </div>
+        </p-overlayPanel>
+      </div>
+    </div>
+
+    <!-- ===== Contenido Día / Semana ===== -->
+    <div [ngSwitch]="viewMode()">
+      <!-- ===== VISTA DÍA ===== -->
+      <ng-container *ngSwitchCase="'day'">
+        <p-table
+          [lazy]="true"
+          [value]="dayPageRows()"
+          [totalRecords]="dayTotalRecords()"
+          [first]="first()"
+          [rows]="rowsPerPage()"
+          [paginator]="true"
+          (onPage)="onPage($event)"
+          responsiveLayout="scroll"
+          [tableStyle]="{
+            'min-width': '620px',
+            'table-layout': 'fixed',
+            width: '100%'
+          }"
+          styleClass="schedule-table"
+          [attr.aria-label]="'Listado de turnos del día por empleado'"
+        >
+          <ng-template pTemplate="colgroup">
+            <col style="width: 240px" />
+            <col style="width: 110px" />
+            <col style="width: 110px" />
+            <col style="width: 180px" />
+            <col style="width: var(--state-chip-w, 110px)" />
+          </ng-template>
+
+          <ng-template pTemplate="header">
+            <tr>
+              <th scope="col">Empleado</th>
+              <th scope="col">Hora</th>
+              <th scope="col">Salida</th>
+              <th scope="col">Rol</th>
+              <th scope="col" class="state-col">Estado</th>
+            </tr>
+          </ng-template>
+
+          <ng-template pTemplate="body" let-row>
+            <tr
+              *ngIf="!isPlaceholder(row); else emptyRow"
+              class="state-row"
+              [style.--row-bg]="rowBg(getStatus(row))"
+              [attr.aria-current]="getStatus(row) === 'on' ? 'true' : null"
+              tabindex="0"
+            >
+              <th scope="row" class="employee ellipsis">{{ row.employee }}</th>
+              <td class="time">{{ row.start || row.time }}</td>
+              <td class="time">{{ row.end || "—" }}</td>
+              <td class="role">{{ row.role }}</td>
+              <td class="state-col">
+                <p-tag
+                  [value]="statusLabel(getStatus(row))"
+                  [severity]="statusSeverity(getStatus(row))"
+                  [styleClass]="'state-chip'"
+                ></p-tag>
+              </td>
+            </tr>
+
+            <ng-template #emptyRow>
+              <tr class="placeholder" aria-hidden="true" tabindex="-1">
+                <td colspan="5">&nbsp;</td>
+              </tr>
+            </ng-template>
+          </ng-template>
+        </p-table>
+      </ng-container>
+
+      <!-- ===== VISTA SEMANA ===== -->
+      <ng-container *ngSwitchCase="'week'">
+        <p-table
+          [lazy]="true"
+          [value]="weekPageEmployees()"
+          [totalRecords]="weekTotalRecords()"
+          [first]="weekFirst()"
+          [rows]="weekRowsPerPage()"
+          [paginator]="true"
+          (onPage)="onWeekPage($event)"
+          responsiveLayout="scroll"
+          [tableStyle]="{
+            'min-width': '760px',
+            'table-layout': 'fixed',
+            width: '100%'
+          }"
+          styleClass="schedule-table week-table"
+        >
+
+          <ng-template pTemplate="colgroup">
+            <col style="width: 220px" />
+            <col
+              *ngFor="let d of weekDays()"
+              style="width: calc((100% - 220px) / 7)"
+            />
+          </ng-template>
+
+          <ng-template pTemplate="header">
+            <tr>
+              <th scope="col">Empleado</th>
+              <th scope="col" *ngFor="let d of weekDays()">
+                {{ d.date | date : "EEE dd" }}
+              </th>
+            </tr>
+          </ng-template>
+
+          <ng-template pTemplate="body" let-emp>
+            <tr *ngIf="!isWeekPlaceholder(emp); else weekEmptyRow">
+              <th scope="row" class="employee ellipsis">{{ emp }}</th>
+
+              <td
+                *ngFor="let d of weekDays()"
+                class="week-cell"
+                [style.--cell-bg]="cellBg(weekCellStatus(emp, d.iso))"
+                [ngClass]="{ empty: !weekCellHasEntries(emp, d.iso) }"
+              >
+                <ng-container
+                  *ngIf="weekCellHasEntries(emp, d.iso); else emptyCell"
+                >
+                  <span class="range">
+                    {{ weekCellFirstEntry(emp, d.iso).start }} –
+                    {{ weekCellFirstEntry(emp, d.iso).end || "—" }}
+                  </span>
+                  <span
+                    class="more"
+                    *ngIf="weekCell(emp, d.iso).entries.length > 1"
+                  >
+                    +{{ weekCell(emp, d.iso).entries.length - 1 }}
+                  </span>
+                </ng-container>
+                <ng-template #emptyCell>—</ng-template>
+              </td>
+            </tr>
+
+            <ng-template #weekEmptyRow>
+              <tr class="placeholder" aria-hidden="true" tabindex="-1">
+                <td [attr.colspan]="1 + weekDays().length">&nbsp;</td>
+              </tr>
+            </ng-template>
+          </ng-template>
+        </p-table>
+      </ng-container>
+    </div>
+  </p-card>
+</section>

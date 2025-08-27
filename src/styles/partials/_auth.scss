@@ -1,0 +1,250 @@
+/* =============================================================================
+   TimeLogic · Auth Styles (partial)
+   ============================================================================= */
+
+/* ---- Variables (overrideables con @use ... with (...)) ---- */
+$bg-page: #f5f5f5 !default;
+$text-900: #111827 !default;
+$text-600: #6b7280 !default;
+$primary-600: #0284c7 !default;
+$icon-color: #14739a !default;
+$separator-color: #d1d5db !default;
+
+$shadow-card: 0 8px 24px rgba(0, 0, 0, 0.1) !default;
+$shadow-btn: 0 2px 8px rgba(2, 132, 199, 0.1) !default;
+$shadow-btn-hover: 0 4px 14px rgba(2, 132, 199, 0.15) !default;
+$error-color: #d32f2f !default;
+
+/* Hueco para icono + separador */
+$leading-offset: 52px !default;
+
+/* ---- Mixin principal: imprime todos los estilos de Auth ---- */
+@mixin auth-page() {
+  /* 1) Shell + Card + Header */
+  .auth-shell {
+    min-height: 100dvh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: clamp(12px, 3vw, 32px);
+    background: $bg-page;
+    box-sizing: border-box;
+    overflow: auto;
+  }
+
+  .auth-card {
+    width: 100%;
+    max-width: clamp(320px, 95vw, 480px);
+    border-radius: clamp(10px, 2vw, 14px);
+
+    .p-card {
+      border-radius: inherit;
+      box-shadow: $shadow-card;
+    }
+    .p-card-header,
+    .p-card-footer {
+      background: #fff;
+      border: 0;
+      padding: 0;
+    }
+    .p-card-body {
+      padding: 0;
+    }
+  }
+
+  .auth-card-scroll .p-card-body {
+    max-height: 90svh;
+    overflow: auto;
+    scrollbar-gutter: stable both-edges;
+  }
+
+  .auth-header {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: clamp(16px, 3.5vw, 28px) clamp(16px, 4vw, 32px) 0;
+
+    .brand {
+      width: clamp(96px, 22vw, 160px);
+      height: clamp(96px, 22vw, 160px);
+      margin-bottom: clamp(8px, 1.6vw, 12px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+
+      img,
+      i {
+        width: 100%;
+        height: 100%;
+        object-fit: contain;
+        border-radius: 50%;
+      }
+      i {
+        font-size: clamp(36px, 7vw, 48px);
+      }
+    }
+
+    .title {
+      margin: 0;
+      font-size: clamp(20px, 3.4vw, 26px);
+      font-weight: 700;
+      color: $text-900;
+      text-align: center;
+    }
+    .subtitle {
+      margin: 6px 0 0;
+      font-size: clamp(14px, 2.6vw, 16px);
+      color: $text-600;
+      text-align: center;
+    }
+  }
+
+  /* 2) Form & Field */
+  .auth-form {
+    padding: clamp(16px, 4vw, 24px) clamp(16px, 4vw, 28px)
+      clamp(12px, 4vw, 18px);
+    display: flex;
+    flex-direction: column;
+    gap: clamp(8px, 2vw, 14px);
+  }
+  .field {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  /* 3) Campos con icono + separador + label flotante */
+  .p-input-icon-left.with-separator {
+    position: relative;
+    display: flex;
+    align-items: center;
+
+    > i {
+      position: absolute;
+      left: 10px;
+      z-index: 2;
+      pointer-events: none;
+      color: $icon-color;
+      font-size: 1.1rem;
+    }
+
+    &::after {
+      content: "";
+      position: absolute;
+      left: 38px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 1px;
+      height: 60%;
+      background: $separator-color;
+      z-index: 1;
+    }
+
+    .p-password {
+      display: block;
+      width: 100%;
+      position: relative;
+    }
+  }
+
+  .p-input-icon-left.with-separator input.p-inputtext {
+    width: 100%;
+    min-height: 40px;
+    font-size: 0.95rem;
+    padding-left: $leading-offset !important;
+  }
+
+  .p-input-icon-left.p-float-label {
+    position: relative;
+    > label {
+      left: $leading-offset;
+    }
+    &.p-inputwrapper-filled > label,
+    &.p-inputwrapper-focus > label {
+      left: $leading-offset;
+    }
+  }
+
+  /* 4) Apariencia inputs (blanco + placeholder negro) */
+  .auth-form input.p-inputtext {
+    background-color: #fff !important;
+    color: #111827 !important;
+    border: 1px solid #e5e7eb;
+  }
+
+  /* p-password: atravesamos la encapsulación con ::ng-deep */
+  :host ::ng-deep .auth-form .p-password .p-inputtext {
+    background-color: #fff !important;
+    color: #111827 !important;
+    border: 1px solid #e5e7eb !important;
+  }
+
+  .auth-form input.p-inputtext::placeholder,
+  :host ::ng-deep .auth-form .p-password .p-inputtext::placeholder {
+    color: #111827 !important;
+    opacity: 1;
+  }
+
+  /* “Filled mode” global */
+  :host-context(.p-input-filled) .auth-form input.p-inputtext,
+  :host-context(.p-input-filled) ::ng-deep .auth-form .p-password .p-inputtext {
+    background-color: #fff !important;
+    color: #111827 !important;
+  }
+
+  /* Autofill */
+  .auth-form input.p-inputtext:-webkit-autofill,
+  :host ::ng-deep .auth-form .p-password .p-inputtext:-webkit-autofill {
+    -webkit-box-shadow: 0 0 0 1000px #fff inset !important;
+    -webkit-text-fill-color: #111827 !important;
+  }
+
+  /* 5) p-password: padding interno y espacio para el toggle */
+  :host ::ng-deep .p-input-icon-left.with-separator .p-password-input {
+    padding-left: $leading-offset !important;
+    padding-right: 2.25rem; // hueco para el icono “ojo”
+    min-height: 40px;
+    font-size: 0.95rem;
+  }
+
+  /* 6) Errores */
+  .p-error {
+    font-size: 0.85rem;
+    color: $error-color;
+    min-height: 1.1em;
+  }
+
+  /* 7) Botón submit */
+  .auth-submit.p-button {
+    margin-top: 6px;
+    width: 100%;
+    min-height: 42px;
+    border-radius: 10px;
+    font-size: 1rem;
+    box-shadow: $shadow-btn;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.35rem;
+
+    &:enabled:hover {
+      box-shadow: $shadow-btn-hover;
+      filter: brightness(1.06);
+    }
+  }
+
+  /* 8) Footer */
+  .auth-footer {
+    text-align: center;
+    padding: 0 clamp(16px, 4vw, 28px) clamp(14px, 4vw, 20px);
+
+    a {
+      color: $primary-600;
+      font-weight: 600;
+      text-decoration: none;
+      &:hover {
+        text-decoration: underline;
+      }
+    }
+  }
+}
